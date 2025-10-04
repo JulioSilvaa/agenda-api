@@ -1,0 +1,7 @@
+.husky/
+docs/
+node_modules/
+.eslintignore
+.prettierignore
+node_modules/
+
