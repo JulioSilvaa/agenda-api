@@ -4,4 +4,6 @@ node_modules/
 .eslintignore
 .prettierignore
 node_modules/
+coverage/
 
+*.md
