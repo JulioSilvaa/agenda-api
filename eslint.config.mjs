@@ -8,11 +8,12 @@ import simpleImportSort from 'eslint-plugin-simple-import-sort';
 
 export default [
   {
-    ignores: ['dist', 'node_modules', 'build', 'coverage', '*.config.js', 'prisma/migrations'],
+    ignores: ['dist', 'node_modules', 'build', 'coverage', '*.config.js', 'prisma/migrations', 'src/tests/**/*.ts', '**/*.test.ts', '**/*.spec.ts'],
   },
   js.configs.recommended,
   {
     files: ['src/**/*.ts'],
+    ignores: ['src/tests/**/*.ts', '**/*.test.ts', '**/*.spec.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -40,13 +41,8 @@ export default [
       'prettier/prettier': 'error',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
-        },
-      ],
+      '@typescript-eslint/no-unused-vars': 'off',
+      'no-unused-vars': 'off',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',

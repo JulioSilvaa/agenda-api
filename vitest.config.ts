@@ -1,8 +1,6 @@
-import { defineConfig } from 'vitest/config'
-
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-
   resolve: {
     alias: {
       '@': '/src',
@@ -19,12 +17,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'dist/',
-        '**/*.spec.ts',
-        '**/*.config.ts',
-      ],
+      exclude: ['node_modules/', 'dist/', '**/*.spec.ts', '**/*.config.ts'],
     },
   },
-})
+});

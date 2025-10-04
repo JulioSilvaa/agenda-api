@@ -1,6 +1,6 @@
 import { ITenant } from '../interfaces/Tenant';
 
-export class Tenant {
+export class TenantEntity {
   private readonly _id?: string | null;
   private readonly _name: string;
   private readonly _slug: string;
@@ -21,8 +21,8 @@ export class Tenant {
     this.validate();
   }
 
-  static create(props: ITenant): Omit<Tenant, 'id' | 'isActive' | 'createdAt' | 'updatedAt'> {
-    return new Tenant(props);
+  static create(props: ITenant): TenantEntity {
+    return new TenantEntity(props);
   }
 
   private validate(): void {
