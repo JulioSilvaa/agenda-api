@@ -19,8 +19,8 @@
   },
   "lint-staged": {
     "*.ts": [
-      "eslint --fix",
       "prettier --write",
+      "eslint --fix",
       "vitest related --run"
     ],
     "*.json": [
