@@ -1,4 +1,4 @@
-import { IService } from '../interfaces/Service';
+import { IService } from "../interfaces/Service";
 
 export class ServiceEntity {
   private readonly _id?: string;
@@ -11,7 +11,7 @@ export class ServiceEntity {
   private readonly _createdAt: Date;
   private readonly _updatedAt: Date;
 
-  constructor(props: IService) {
+  constructor(private props: IService) {
     this._id = props.id;
     this._tenantId = props.tenantId;
     this._name = props.name;
@@ -40,41 +40,41 @@ export class ServiceEntity {
 
   private validateName(): void {
     if (!this._name || this._name.trim().length === 0) {
-      throw new Error('Nome é obrigatório');
+      throw new Error("Nome é obrigatório");
     }
 
     if (this._name.trim().length < 3) {
-      throw new Error('Nome deve ter pelo menos 3 caracteres');
+      throw new Error("Nome deve ter pelo menos 3 caracteres");
     }
 
     if (this._name.length > 100) {
-      throw new Error('Nome não pode ter mais de 100 caracteres');
+      throw new Error("Nome não pode ter mais de 100 caracteres");
     }
   }
 
   private validatePrice(): void {
     if (this._price < 0) {
-      throw new Error('Preço não pode ser negativo');
+      throw new Error("Preço não pode ser negativo");
     }
 
     if (this._price === 0) {
-      throw new Error('Preço deve ser maior que zero');
+      throw new Error("Preço deve ser maior que zero");
     }
   }
 
   private validateDuration(): void {
     if (this._durationMinutes <= 0) {
-      throw new Error('Duração deve ser maior que zero');
+      throw new Error("Duração deve ser maior que zero");
     }
 
     if (this._durationMinutes > 1440) {
-      throw new Error('Duração não pode ser maior que 24 horas (1440 minutos)');
+      throw new Error("Duração não pode ser maior que 24 horas (1440 minutos)");
     }
   }
 
   private validateTenantId(): void {
     if (!this._tenantId || this._tenantId.trim().length === 0) {
-      throw new Error('TenantId é obrigatório');
+      throw new Error("TenantId é obrigatório");
     }
   }
 
@@ -82,13 +82,15 @@ export class ServiceEntity {
     if (!this._description) return;
 
     if (this._description.length > 500) {
-      throw new Error('Descrição não pode ter mais de 500 caracteres');
+      throw new Error("Descrição não pode ter mais de 500 caracteres");
     }
   }
 
   private validateDates(): void {
     if (this._updatedAt < this._createdAt) {
-      throw new Error('Data de atualização não pode ser anterior à data de criação');
+      throw new Error(
+        "Data de atualização não pode ser anterior à data de criação"
+      );
     }
   }
 
