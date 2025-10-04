@@ -5,17 +5,17 @@ export default {
       2,
       'always',
       [
-        'feat',
-        'fix',
-        'docs',
-        'style',
-        'refactor',
-        'test',
-        'chore',
-        'perf',
-        'ci',
-        'build',
-        'revert',
+        'feat',     // Nova funcionalidade
+        'fix',      // Correção de bug
+        'docs',     // Documentação
+        'style',    // Formatação
+        'refactor', // Refatoração
+        'test',     // Testes
+        'chore',    // Tarefas de manutenção
+        'perf',     // Performance
+        'ci',       // CI/CD
+        'build',    // Build
+        'revert',   // Reverter commit
       ],
     ],
   },
