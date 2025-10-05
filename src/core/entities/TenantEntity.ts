@@ -6,6 +6,7 @@ export class TenantEntity {
   private readonly _slug: string;
   private readonly _isActive: boolean;
   private readonly _email: string;
+  private readonly _password: string;
   private readonly _phone?: string | null;
   private readonly _address?: string | null;
 
@@ -16,6 +17,7 @@ export class TenantEntity {
     this._email = props.email;
     this._isActive = props.isActive;
     this._phone = props.phone;
+    this._password = props.password;
     this._address = props.address;
 
     this.validate();
@@ -37,6 +39,12 @@ export class TenantEntity {
     if (!this._slug || !this.validateSlug(this._slug)) {
       throw new Error(
         "Slug inválido. Use apenas letras minúsculas, números e hífens"
+      );
+    }
+
+    if (!this._password || !this.validatePassword(this._password)) {
+      throw new Error(
+        "Senha inválida. A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma minúscula, um número e um caractere especial."
       );
     }
 
@@ -67,6 +75,13 @@ export class TenantEntity {
     );
   }
 
+  private validatePassword(password: string): boolean {
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+
+    return passwordRegex.test(password);
+  }
+
   // Getters
   get id(): string | null {
     return this._id ?? null;
@@ -94,5 +109,9 @@ export class TenantEntity {
 
   get address(): string | null {
     return this._address ?? null;
+  }
+
+  get password(): string | null {
+    return this._password ?? null;
   }
 }
