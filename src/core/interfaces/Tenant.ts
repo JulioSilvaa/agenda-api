@@ -6,4 +6,5 @@ export interface ITenant {
   phone?: string | null;
   isActive: boolean;
   address?: string | null;
+  password: string;
 }
