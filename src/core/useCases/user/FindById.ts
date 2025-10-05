@@ -1,5 +1,6 @@
 import { UserEntity } from "../../entities/UserEntity";
-import IUserRepository from "../../repositories/UserRepository";
+import { IUserRepository } from "../../repositories/UserRepository";
+
 
 export default class FindByIdUser {
   private readonly userRepository: IUserRepository;

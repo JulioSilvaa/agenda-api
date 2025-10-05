@@ -16,6 +16,7 @@ describe('Unit test CreateAvailability UseCase', () => {
     email: 'salao@example.com',
     slug: 'salao-beleza',
     phone: '11999999999',
+    password: 'Senha#123',
     isActive: true,
     address: 'Rua Teste, 123',
   };
