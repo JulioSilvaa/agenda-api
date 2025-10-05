@@ -27,9 +27,13 @@
       "prettier --write"
     ]
   },
+  "dependencies": {
+    "bcrypt": "^6.0.0"
+  },
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
+    "@types/bcrypt": "^5.0.2",
     "@typescript-eslint/eslint-plugin": "^8.45.0",
     "@typescript-eslint/parser": "^8.45.0",
     "@vitest/coverage-v8": "3.2.4",
