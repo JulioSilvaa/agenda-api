@@ -1,30 +1,31 @@
-import { describe, expect, test, beforeEach } from 'vitest';
-import { ServiceRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/ServiceRepositoryInMemory';
-import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantyRepositoryInMemory';
-import { CreateService } from '../../../core/useCases/service/Create';
-import { CreateTenant } from '../../../core/useCases/tenant/Create';
-// import { UpdateService } from '../../../core/useCases/service/Update'; // TODO: Implementar
+import { describe, expect, test, beforeEach } from "vitest";
+import { ServiceRepositoryInMemory } from "../../../infra/repositories/repositoryInMemory/ServiceRepositoryInMemory";
+import { TenantRepositoryInMemory } from "../../../infra/repositories/repositoryInMemory/TenantyRepositoryInMemory";
+import { CreateService } from "../../../core/useCases/service/Create";
+import { CreateTenant } from "../../../core/useCases/tenant/Create";
+import UpdateService from "./../../../core/useCases/service/Update";
 
-describe.skip('Unit test UpdateService UseCase', () => {
+describe("Unit test UpdateService UseCase", () => {
   let serviceRepository: ServiceRepositoryInMemory;
   let tenantRepository: TenantRepositoryInMemory;
   let createService: CreateService;
   let createTenant: CreateTenant;
-  // let updateService: UpdateService; // TODO: Implementar
+  let updateService: UpdateService;
   let tenantId: string;
 
   const validTenant = {
-    name: 'Salão de Beleza',
-    email: 'salao@example.com',
-    slug: 'salao-beleza',
-    phone: '11999999999',
+    name: "Salão de Beleza",
+    email: "salao@example.com",
+    slug: "salao-beleza",
+    phone: "11999999999",
     isActive: true,
-    address: 'Rua Teste, 123',
+    address: "Rua Teste, 123",
+    password: "Senha#123",
   };
 
   const validService = {
-    name: 'Corte de Cabelo',
-    description: 'Corte masculino ou feminino',
+    name: "Corte de Cabelo",
+    description: "Corte masculino ou feminino",
     price: 50.0,
     durationMinutes: 30,
     isActive: true,
@@ -34,15 +35,15 @@ describe.skip('Unit test UpdateService UseCase', () => {
     serviceRepository = new ServiceRepositoryInMemory();
     tenantRepository = new TenantRepositoryInMemory();
     createService = new CreateService(serviceRepository, tenantRepository);
-    // updateService = new UpdateService(serviceRepository, tenantRepository); // TODO: Implementar
+    updateService = new UpdateService(serviceRepository, tenantRepository);
     createTenant = new CreateTenant(tenantRepository);
 
     const tenant = await createTenant.execute(validTenant);
     tenantId = tenant.id!;
   });
 
-  describe('Successful Update', () => {
-    test('should update service name', async () => {
+  describe("Successful Update", () => {
+    test("should update service name", async () => {
       const service = await createService.execute({
         ...validService,
         tenantId,
@@ -62,7 +63,7 @@ describe.skip('Unit test UpdateService UseCase', () => {
       // expect(updated.updatedAt.getTime()).toBeGreaterThan(service.createdAt.getTime());
     });
 
-    test('should update service price', async () => {
+    test("should update service price", async () => {
       const service = await createService.execute({
         ...validService,
         tenantId,
@@ -81,7 +82,7 @@ describe.skip('Unit test UpdateService UseCase', () => {
       // expect(updated.price).toBe(75.0);
     });
 
-    test('should update service duration', async () => {
+    test("should update service duration", async () => {
       const service = await createService.execute({
         ...validService,
         tenantId,
@@ -100,7 +101,7 @@ describe.skip('Unit test UpdateService UseCase', () => {
       // expect(updated.durationMinutes).toBe(60);
     });
 
-    test('should update service description', async () => {
+    test("should update service description", async () => {
       const service = await createService.execute({
         ...validService,
         tenantId,
@@ -119,7 +120,7 @@ describe.skip('Unit test UpdateService UseCase', () => {
       // expect(updated.description).toBe('Nova descrição atualizada');
     });
 
-    test('should update service active status', async () => {
+    test("should update service active status", async () => {
       const service = await createService.execute({
         ...validService,
         tenantId,
@@ -138,7 +139,7 @@ describe.skip('Unit test UpdateService UseCase', () => {
       // expect(updated.isActive).toBe(false);
     });
 
-    test('should update multiple fields at once', async () => {
+    test("should update multiple fields at once", async () => {
       const service = await createService.execute({
         ...validService,
         tenantId,
@@ -160,8 +161,8 @@ describe.skip('Unit test UpdateService UseCase', () => {
     });
   });
 
-  describe('Not Found Errors', () => {
-    test('should throw error when service does not exist', async () => {
+  describe("Not Found Errors", () => {
+    test("should throw error when service does not exist", async () => {
       // await expect(() =>
       //   updateService.execute({
       //     id: 'non-existent-id',
@@ -175,8 +176,8 @@ describe.skip('Unit test UpdateService UseCase', () => {
     });
   });
 
-  describe('Tenant Validation', () => {
-    test('should throw error when trying to update service from different tenant', async () => {
+  describe("Tenant Validation", () => {
+    test("should throw error when trying to update service from different tenant", async () => {
       const service = await createService.execute({
         ...validService,
         tenantId,
@@ -184,8 +185,8 @@ describe.skip('Unit test UpdateService UseCase', () => {
 
       const tenant2 = await createTenant.execute({
         ...validTenant,
-        email: 'outro@example.com',
-        slug: 'outro',
+        email: "outro@example.com",
+        slug: "outro",
       });
 
       // await expect(() =>
@@ -201,18 +202,18 @@ describe.skip('Unit test UpdateService UseCase', () => {
     });
   });
 
-  describe('Name Uniqueness Validation', () => {
-    test('should throw error when updating to duplicate name', async () => {
+  describe("Name Uniqueness Validation", () => {
+    test("should throw error when updating to duplicate name", async () => {
       const service1 = await createService.execute({
         ...validService,
         tenantId,
-        name: 'Serviço 1',
+        name: "Serviço 1",
       });
 
       await createService.execute({
         ...validService,
         tenantId,
-        name: 'Serviço 2',
+        name: "Serviço 2",
       });
 
       // await expect(() =>
@@ -227,7 +228,7 @@ describe.skip('Unit test UpdateService UseCase', () => {
       // ).rejects.toThrow('Já existe um serviço com este nome neste tenant');
     });
 
-    test('should allow update with same name (no change)', async () => {
+    test("should allow update with same name (no change)", async () => {
       const service = await createService.execute({
         ...validService,
         tenantId,
@@ -247,8 +248,8 @@ describe.skip('Unit test UpdateService UseCase', () => {
     });
   });
 
-  describe('Entity Validation Errors', () => {
-    test('should throw error for invalid name', async () => {
+  describe("Entity Validation Errors", () => {
+    test("should throw error for invalid name", async () => {
       const service = await createService.execute({
         ...validService,
         tenantId,
@@ -266,7 +267,7 @@ describe.skip('Unit test UpdateService UseCase', () => {
       // ).rejects.toThrow('Nome deve ter pelo menos 3 caracteres');
     });
 
-    test('should throw error for invalid price', async () => {
+    test("should throw error for invalid price", async () => {
       const service = await createService.execute({
         ...validService,
         tenantId,
@@ -284,7 +285,7 @@ describe.skip('Unit test UpdateService UseCase', () => {
       // ).rejects.toThrow('Preço não pode ser negativo');
     });
 
-    test('should throw error for invalid duration', async () => {
+    test("should throw error for invalid duration", async () => {
       const service = await createService.execute({
         ...validService,
         tenantId,
