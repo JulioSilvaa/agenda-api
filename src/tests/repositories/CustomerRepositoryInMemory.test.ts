@@ -81,8 +81,15 @@ describe('Unit test CustomerRepositoryInMemory', () => {
       await repository.create(customer);
 
       const updated = CustomerEntity.create({
-        ...customer,
+        id: customer.id,
+        tenantId: customer.tenantId,
         name: 'Atualizado',
+        email: customer.email ?? undefined,
+        phone: customer.phone,
+        isActive: customer.isActive,
+        totalBookings: customer.totalBookings,
+        createdAt: customer.createdAt,
+        updatedAt: new Date(),
       });
 
       const result = await repository.update(updated);
@@ -102,9 +109,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         updatedAt: new Date(),
       });
 
-      await expect(() => repository.update(customer)).rejects.toThrow(
-        'Cliente não encontrado'
-      );
+      await expect(() => repository.update(customer)).rejects.toThrow('Cliente não encontrado');
     });
   });
 

@@ -76,7 +76,7 @@ export class BookingEntity {
     if (this._rating === null || this._rating === undefined) return;
 
     if (this._rating < 1 || this._rating > 5) {
-      throw new Error('Avaliação deve ser entre 1 e 5');
+      throw new Error('Avaliação deve estar entre 1 e 5');
     }
   }
 
@@ -84,7 +84,7 @@ export class BookingEntity {
     if (!this._notes) return;
 
     if (this._notes.length > 1000) {
-      throw new Error('Observações não podem ter mais de 1000 caracteres');
+      throw new Error('Notas não podem ter mais de 1000 caracteres');
     }
   }
 
@@ -120,16 +120,16 @@ export class BookingEntity {
     return this._tenantId;
   }
 
-  get customerId(): string | null {
-    return this._customerId ?? null;
+  get customerId(): string | undefined {
+    return this._customerId ?? undefined;
   }
 
-  get serviceId(): string | null {
-    return this._serviceId ?? null;
+  get serviceId(): string | undefined {
+    return this._serviceId ?? undefined;
   }
 
-  get staffUserId(): string | null {
-    return this._staffUserId ?? null;
+  get staffUserId(): string | undefined {
+    return this._staffUserId ?? undefined;
   }
 
   get status(): BookingStatus {
@@ -144,12 +144,12 @@ export class BookingEntity {
     return this._requestedEnd;
   }
 
-  get notes(): string | null {
-    return this._notes ?? null;
+  get notes(): string | undefined {
+    return this._notes ?? undefined;
   }
 
-  get rating(): number | null {
-    return this._rating ?? null;
+  get rating(): number | undefined {
+    return this._rating ?? undefined;
   }
 
   get createdAt(): Date {

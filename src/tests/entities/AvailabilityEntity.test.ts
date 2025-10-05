@@ -59,7 +59,7 @@ describe('Unit test AvailabilityEntity', () => {
           ...validAvailabilityData,
           weekday: -1,
         })
-      ).toThrow('Dia da semana deve ser entre 0 (Domingo) e 6 (Sábado)');
+      ).toThrow('Dia da semana inválido');
     });
 
     test('should reject weekday greater than 6', () => {
@@ -68,7 +68,7 @@ describe('Unit test AvailabilityEntity', () => {
           ...validAvailabilityData,
           weekday: 7,
         })
-      ).toThrow('Dia da semana deve ser entre 0 (Domingo) e 6 (Sábado)');
+      ).toThrow('Dia da semana inválido');
     });
   });
 
@@ -144,7 +144,7 @@ describe('Unit test AvailabilityEntity', () => {
           startTime: '09:00',
           endTime: '09:00',
         })
-      ).toThrow('Horário de término deve ser maior que horário de início');
+      ).toThrow('Horário de término deve ser posterior ao horário de início');
     });
 
     test('should reject endTime before startTime', () => {
@@ -154,7 +154,7 @@ describe('Unit test AvailabilityEntity', () => {
           startTime: '18:00',
           endTime: '09:00',
         })
-      ).toThrow('Horário de término deve ser maior que horário de início');
+      ).toThrow('Horário de término deve ser posterior ao horário de início');
     });
 
     test('should accept time range with 1 minute difference', () => {

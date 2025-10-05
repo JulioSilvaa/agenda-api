@@ -82,8 +82,15 @@ describe('Unit test ServiceRepositoryInMemory', () => {
       await repository.create(service);
 
       const updated = ServiceEntity.create({
-        ...service,
+        id: service.id,
+        tenantId: service.tenantId,
         name: 'Atualizado',
+        description: service.description ?? undefined,
+        price: service.price,
+        durationMinutes: service.durationMinutes,
+        isActive: service.isActive,
+        createdAt: service.createdAt,
+        updatedAt: new Date(),
       });
 
       const result = await repository.update(updated);
@@ -103,9 +110,7 @@ describe('Unit test ServiceRepositoryInMemory', () => {
         updatedAt: new Date(),
       });
 
-      await expect(() => repository.update(service)).rejects.toThrow(
-        'Serviço não encontrado'
-      );
+      await expect(() => repository.update(service)).rejects.toThrow('Serviço não encontrado');
     });
   });
 

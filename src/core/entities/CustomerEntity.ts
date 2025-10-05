@@ -6,6 +6,7 @@ export class CustomerEntity {
   private readonly _name: string;
   private readonly _email?: string | null;
   private readonly _phone: string;
+  private readonly _isActive: boolean;
   private readonly _totalBookings: number;
   private readonly _createdAt: Date;
   private readonly _updatedAt: Date;
@@ -16,6 +17,7 @@ export class CustomerEntity {
     this._name = props.name;
     this._email = props.email ?? null;
     this._phone = props.phone;
+    this._isActive = props.isActive ?? true;
     this._totalBookings = props.totalBookings ?? 0;
     this._createdAt = props.createdAt ?? new Date();
     this._updatedAt = props.updatedAt ?? new Date();
@@ -70,7 +72,11 @@ export class CustomerEntity {
   }
 
   private validateEmail(): void {
-    if (!this._email) return;
+    if (this._email === null || this._email === undefined) return;
+
+    if (this._email.trim().length === 0) {
+      throw new Error('Email não pode ser vazio');
+    }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this._email)) {
@@ -114,6 +120,10 @@ export class CustomerEntity {
 
   get phone(): string {
     return this._phone;
+  }
+
+  get isActive(): boolean {
+    return this._isActive;
   }
 
   get totalBookings(): number {

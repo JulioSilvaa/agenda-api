@@ -1,6 +1,6 @@
 import { BookingEntity } from '../../../core/entities/BookingEntity';
-import { IBookingRepository } from '../../../core/repositories/BookingRepository';
 import { BookingStatus } from '../../../core/interfaces/Booking';
+import { IBookingRepository } from '../../../core/repositories/BookingRepository';
 
 export class BookingRepositoryInMemory implements IBookingRepository {
   private bookings: BookingEntity[] = [];

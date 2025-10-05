@@ -12,4 +12,8 @@ export class TenantRepositoryInMemory implements ITenantRepository {
     const tenant = this.tenants.find(t => t.email === email);
     return tenant ? tenant : null;
   }
+  async findById(id: string): Promise<TenantEntity | null> {
+    const tenant = this.tenants.find(t => t.id === id);
+    return tenant ? tenant : null;
+  }
 }

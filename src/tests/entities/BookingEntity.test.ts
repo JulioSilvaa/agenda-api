@@ -50,10 +50,10 @@ describe('Unit test BookingEntity', () => {
         notes: undefined,
       });
 
-      expect(booking.customerId).toBeNull();
-      expect(booking.serviceId).toBeNull();
-      expect(booking.staffUserId).toBeNull();
-      expect(booking.notes).toBeNull();
+      expect(booking.customerId).toBeUndefined();
+      expect(booking.serviceId).toBeUndefined();
+      expect(booking.staffUserId).toBeUndefined();
+      expect(booking.notes).toBeUndefined();
     });
   });
 
@@ -155,7 +155,7 @@ describe('Unit test BookingEntity', () => {
         rating: undefined,
       });
 
-      expect(booking.rating).toBeNull();
+      expect(booking.rating).toBeUndefined();
     });
 
     test('should accept rating 1', () => {
@@ -182,7 +182,7 @@ describe('Unit test BookingEntity', () => {
           ...validBookingData,
           rating: 0,
         })
-      ).toThrow('Avaliação deve ser entre 1 e 5');
+      ).toThrow('Avaliação deve estar entre 1 e 5');
     });
 
     test('should reject rating greater than 5', () => {
@@ -191,7 +191,7 @@ describe('Unit test BookingEntity', () => {
           ...validBookingData,
           rating: 6,
         })
-      ).toThrow('Avaliação deve ser entre 1 e 5');
+      ).toThrow('Avaliação deve estar entre 1 e 5');
     });
   });
 
@@ -207,7 +207,7 @@ describe('Unit test BookingEntity', () => {
         notes: undefined,
       });
 
-      expect(booking.notes).toBeNull();
+      expect(booking.notes).toBeUndefined();
     });
 
     test('should reject notes with more than 1000 characters', () => {
@@ -216,7 +216,7 @@ describe('Unit test BookingEntity', () => {
           ...validBookingData,
           notes: 'a'.repeat(1001),
         })
-      ).toThrow('Observações não podem ter mais de 1000 caracteres');
+      ).toThrow('Notas não podem ter mais de 1000 caracteres');
     });
   });
 

@@ -270,7 +270,7 @@ describe('Unit test CreateCustomer UseCase', () => {
       };
 
       await expect(() => createCustomer.execute(customerData)).rejects.toThrow(
-        'Email é obrigatório'
+        'Email não pode ser vazio'
       );
     });
 
@@ -281,17 +281,11 @@ describe('Unit test CreateCustomer UseCase', () => {
         email: 'invalid-email',
       };
 
-      await expect(() => createCustomer.execute(customerData)).rejects.toThrow(
-        'Email inválido'
-      );
+      await expect(() => createCustomer.execute(customerData)).rejects.toThrow('Email inválido');
     });
 
     test('should accept valid email formats', async () => {
-      const validEmails = [
-        'user@example.com',
-        'user.name@example.com',
-        'user+tag@example.co.uk',
-      ];
+      const validEmails = ['user@example.com', 'user.name@example.com', 'user+tag@example.co.uk'];
 
       for (const email of validEmails) {
         const customer = await createCustomer.execute({
@@ -326,17 +320,11 @@ describe('Unit test CreateCustomer UseCase', () => {
         phone: '123',
       };
 
-      await expect(() => createCustomer.execute(customerData)).rejects.toThrow(
-        'Telefone inválido'
-      );
+      await expect(() => createCustomer.execute(customerData)).rejects.toThrow('Telefone inválido');
     });
 
     test('should accept valid phone formats', async () => {
-      const validPhones = [
-        '11999999999',
-        '11988888888',
-        '21987654321',
-      ];
+      const validPhones = ['11999999999', '11988888888', '21987654321'];
 
       for (const phone of validPhones) {
         const customer = await createCustomer.execute({

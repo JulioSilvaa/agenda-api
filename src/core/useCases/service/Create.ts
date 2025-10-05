@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 import { ServiceEntity } from '../../entities/ServiceEntity';
 import { IService } from '../../interfaces/Service';
 import { IServiceRepository } from '../../repositories/ServiceRepository';

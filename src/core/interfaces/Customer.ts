@@ -4,6 +4,7 @@ export interface ICustomer {
   name: string;
   email?: string;
   phone: string;
+  isActive?: boolean;
   totalBookings: number;
   createdAt: Date;
   updatedAt: Date;

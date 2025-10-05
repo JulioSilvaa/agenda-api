@@ -81,8 +81,14 @@ describe('Unit test AvailabilityRepositoryInMemory', () => {
       await repository.create(availability);
 
       const updated = AvailabilityEntity.create({
-        ...availability,
+        id: availability.id,
+        tenantId: availability.tenantId,
+        weekday: availability.weekday,
         startTime: '10:00',
+        endTime: availability.endTime,
+        isActive: availability.isActive,
+        createdAt: availability.createdAt,
+        updatedAt: new Date(),
       });
 
       const result = await repository.update(updated);
@@ -371,12 +377,7 @@ describe('Unit test AvailabilityRepositoryInMemory', () => {
 
       await repository.create(availability);
 
-      const conflicts = await repository.findConflictingSlots(
-        tenantId,
-        1,
-        '10:00',
-        '13:00'
-      );
+      const conflicts = await repository.findConflictingSlots(tenantId, 1, '10:00', '13:00');
 
       expect(conflicts).toHaveLength(1);
       expect(conflicts[0].id).toBe(availability.id);
@@ -396,12 +397,7 @@ describe('Unit test AvailabilityRepositoryInMemory', () => {
 
       await repository.create(availability);
 
-      const conflicts = await repository.findConflictingSlots(
-        tenantId,
-        2,
-        '10:00',
-        '13:00'
-      );
+      const conflicts = await repository.findConflictingSlots(tenantId, 2, '10:00', '13:00');
 
       expect(conflicts).toHaveLength(0);
     });
@@ -420,12 +416,7 @@ describe('Unit test AvailabilityRepositoryInMemory', () => {
 
       await repository.create(availability);
 
-      const conflicts = await repository.findConflictingSlots(
-        tenant2Id,
-        1,
-        '10:00',
-        '13:00'
-      );
+      const conflicts = await repository.findConflictingSlots(tenant2Id, 1, '10:00', '13:00');
 
       expect(conflicts).toHaveLength(0);
     });
@@ -444,12 +435,7 @@ describe('Unit test AvailabilityRepositoryInMemory', () => {
 
       await repository.create(availability);
 
-      const conflicts = await repository.findConflictingSlots(
-        tenantId,
-        1,
-        '12:00',
-        '15:00'
-      );
+      const conflicts = await repository.findConflictingSlots(tenantId, 1, '12:00', '15:00');
 
       expect(conflicts).toHaveLength(0);
     });
@@ -468,12 +454,7 @@ describe('Unit test AvailabilityRepositoryInMemory', () => {
 
       await repository.create(availability);
 
-      const conflicts = await repository.findConflictingSlots(
-        tenantId,
-        1,
-        '12:00',
-        '14:00'
-      );
+      const conflicts = await repository.findConflictingSlots(tenantId, 1, '12:00', '14:00');
 
       expect(conflicts).toHaveLength(1);
     });
@@ -492,12 +473,7 @@ describe('Unit test AvailabilityRepositoryInMemory', () => {
 
       await repository.create(availability);
 
-      const conflicts = await repository.findConflictingSlots(
-        tenantId,
-        1,
-        '09:00',
-        '18:00'
-      );
+      const conflicts = await repository.findConflictingSlots(tenantId, 1, '09:00', '18:00');
 
       expect(conflicts).toHaveLength(1);
     });

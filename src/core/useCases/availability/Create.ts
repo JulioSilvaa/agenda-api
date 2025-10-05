@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 import { AvailabilityEntity } from '../../entities/AvailabilityEntity';
 import { IAvailability } from '../../interfaces/Availability';
 import { IAvailabilityRepository } from '../../repositories/AvailabilityRepository';
@@ -7,12 +9,17 @@ export class CreateAvailability {
   private readonly availabilityRepository: IAvailabilityRepository;
   private readonly tenantRepository: ITenantRepository;
 
-  constructor(availabilityRepository: IAvailabilityRepository, tenantRepository: ITenantRepository) {
+  constructor(
+    availabilityRepository: IAvailabilityRepository,
+    tenantRepository: ITenantRepository
+  ) {
     this.availabilityRepository = availabilityRepository;
     this.tenantRepository = tenantRepository;
   }
 
-  async execute(data: Omit<IAvailability, 'id' | 'createdAt' | 'updatedAt'>): Promise<AvailabilityEntity> {
+  async execute(
+    data: Omit<IAvailability, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<AvailabilityEntity> {
     // Validar se o tenant existe
     const tenantExists = await this.tenantRepository.findById(data.tenantId);
     if (!tenantExists) {

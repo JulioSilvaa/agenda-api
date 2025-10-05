@@ -88,8 +88,18 @@ describe('Unit test BookingRepositoryInMemory', () => {
       await repository.create(booking);
 
       const updated = BookingEntity.create({
-        ...booking,
+        id: booking.id,
+        tenantId: booking.tenantId,
+        customerId: booking.customerId ?? undefined,
+        serviceId: booking.serviceId ?? undefined,
+        staffUserId: booking.staffUserId ?? undefined,
         status: BookingStatus.CONFIRMED,
+        requestedStart: booking.requestedStart,
+        requestedEnd: booking.requestedEnd,
+        notes: booking.notes ?? undefined,
+        rating: booking.rating ?? undefined,
+        createdAt: booking.createdAt,
+        updatedAt: new Date(),
       });
 
       const result = await repository.update(updated);
@@ -110,9 +120,7 @@ describe('Unit test BookingRepositoryInMemory', () => {
         updatedAt: new Date(),
       });
 
-      await expect(() => repository.update(booking)).rejects.toThrow(
-        'Agendamento não encontrado'
-      );
+      await expect(() => repository.update(booking)).rejects.toThrow('Agendamento não encontrado');
     });
   });
 

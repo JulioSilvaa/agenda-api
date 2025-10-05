@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 import { TenantEntity } from '../../entities/TenantEntity';
 import { ITenant } from '../../interfaces/Tenant';
 import { ITenantRepository } from '../../repositories/TenantRepository';
@@ -14,7 +16,12 @@ export class CreateTenant {
       throw new Error('Já existe um tenant com este email');
     }
 
-    const tenant = TenantEntity.create(data);
+    const tenantData: ITenant = {
+      ...data,
+      id: crypto.randomUUID(),
+    };
+
+    const tenant = TenantEntity.create(tenantData);
     return await this.tenantRepository.create(tenant);
   }
 }

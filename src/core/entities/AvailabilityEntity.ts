@@ -37,7 +37,7 @@ export class AvailabilityEntity {
 
   private validateWeekday(): void {
     if (this._weekday < 0 || this._weekday > 6) {
-      throw new Error('Dia da semana deve ser entre 0 (Domingo) e 6 (Sábado)');
+      throw new Error('Dia da semana inválido');
     }
   }
 
@@ -61,7 +61,7 @@ export class AvailabilityEntity {
     const endMinutes = endHour * 60 + endMinute;
 
     if (endMinutes <= startMinutes) {
-      throw new Error('Horário de término deve ser maior que horário de início');
+      throw new Error('Horário de término deve ser posterior ao horário de início');
     }
   }
 

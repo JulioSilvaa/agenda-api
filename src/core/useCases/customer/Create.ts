@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 import { CustomerEntity } from '../../entities/CustomerEntity';
 import { ICustomer } from '../../interfaces/Customer';
 import { ICustomerRepository } from '../../repositories/CustomerRepository';
@@ -20,13 +22,19 @@ export class CreateCustomer {
     }
 
     // Validar se já existe um cliente com o mesmo email no tenant
-    const existingCustomerByEmail = await this.customerRepository.findByEmail(data.email, data.tenantId);
+    const existingCustomerByEmail = await this.customerRepository.findByEmail(
+      data.email,
+      data.tenantId
+    );
     if (existingCustomerByEmail) {
       throw new Error('Já existe um cliente com este email neste tenant');
     }
 
     // Validar se já existe um cliente com o mesmo telefone no tenant
-    const existingCustomerByPhone = await this.customerRepository.findByPhone(data.phone, data.tenantId);
+    const existingCustomerByPhone = await this.customerRepository.findByPhone(
+      data.phone,
+      data.tenantId
+    );
     if (existingCustomerByPhone) {
       throw new Error('Já existe um cliente com este telefone neste tenant');
     }
