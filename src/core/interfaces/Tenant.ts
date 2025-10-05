@@ -1,5 +1,5 @@
 export interface ITenant {
-  id?: string | null;
+  id?: string;
   name: string;
   slug: string;
   email: string;

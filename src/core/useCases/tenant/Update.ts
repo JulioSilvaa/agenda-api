@@ -27,7 +27,6 @@ export default class UpdateTenant {
     }
 
     const updatedTenant = TenantEntity.create({
-      id: existingTenant.id,
       slug: "",
       isActive: existingTenant.isActive,
       name:

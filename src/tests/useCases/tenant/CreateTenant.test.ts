@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { TenantRepositoryInMemory } from "./../../../infra/repositories/repositoryInMemory/TenantyRepositoryInMemory";
+import { TenantRepositoryInMemory } from "./../../../infra/repositories/repositoryInMemory/TenantRepositoryInMemory";
 import { CreateTenant } from "./../../../core/useCases/tenant/Create";
 
 describe("Unit test CreateTenant UseCase", () => {

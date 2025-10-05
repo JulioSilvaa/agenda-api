@@ -15,8 +15,6 @@ export class CreateTenant {
     }
 
     const tenant = TenantEntity.create(data);
-    console.log(data, "data no usecase");
-    console.log(data.password, "data no usecase");
     return await this.tenantRepository.create(tenant);
   }
 }
