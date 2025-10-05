@@ -1,4 +1,4 @@
-import { BookingStatus, IBooking } from '../interfaces/Booking';
+import { BookingStatus, IBooking } from "../interfaces/Booking";
 
 export class BookingEntity {
   private readonly _id?: string;
@@ -14,7 +14,7 @@ export class BookingEntity {
   private readonly _createdAt: Date;
   private readonly _updatedAt: Date;
 
-  constructor(props: IBooking) {
+  constructor(private props: IBooking) {
     this._id = props.id;
     this._tenantId = props.tenantId;
     this._customerId = props.customerId ?? null;
@@ -46,29 +46,31 @@ export class BookingEntity {
 
   private validateTenantId(): void {
     if (!this._tenantId || this._tenantId.trim().length === 0) {
-      throw new Error('TenantId é obrigatório');
+      throw new Error("TenantId é obrigatório");
     }
   }
 
   private validateStatus(): void {
     if (!Object.values(BookingStatus).includes(this._status)) {
-      throw new Error('Status inválido');
+      throw new Error("Status inválido");
     }
   }
 
   private validateDates(): void {
     if (this._updatedAt < this._createdAt) {
-      throw new Error('Data de atualização não pode ser anterior à data de criação');
+      throw new Error(
+        "Data de atualização não pode ser anterior à data de criação"
+      );
     }
   }
 
   private validateTimeRange(): void {
     if (this._requestedEnd <= this._requestedStart) {
-      throw new Error('Data de término deve ser posterior à data de início');
+      throw new Error("Data de término deve ser posterior à data de início");
     }
 
     if (this._requestedStart < new Date()) {
-      throw new Error('Data de início não pode ser no passado');
+      throw new Error("Data de início não pode ser no passado");
     }
   }
 
@@ -105,7 +107,10 @@ export class BookingEntity {
   }
 
   canBeCancelled(): boolean {
-    return this._status === BookingStatus.PENDING || this._status === BookingStatus.CONFIRMED;
+    return (
+      this._status === BookingStatus.PENDING ||
+      this._status === BookingStatus.CONFIRMED
+    );
   }
 
   canBeRated(): boolean {

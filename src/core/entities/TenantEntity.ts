@@ -1,4 +1,4 @@
-import { ITenant } from '../interfaces/Tenant';
+import { ITenant } from "../interfaces/Tenant";
 
 export class TenantEntity {
   private readonly _id?: string | null;
@@ -6,16 +6,18 @@ export class TenantEntity {
   private readonly _slug: string;
   private readonly _isActive: boolean;
   private readonly _email: string;
+  private readonly _password: string;
   private readonly _phone?: string | null;
   private readonly _address?: string | null;
 
-  constructor(props: ITenant) {
+  constructor(private props: ITenant) {
     this._id = props.id ?? null;
     this._name = props.name;
     this._slug = props.slug;
     this._email = props.email;
     this._isActive = props.isActive;
     this._phone = props.phone;
+    this._password = props.password;
     this._address = props.address;
 
     this.validate();
@@ -27,19 +29,27 @@ export class TenantEntity {
 
   private validate(): void {
     if (!this._name || this._name.trim().length < 3) {
-      throw new Error('Nome do tenant deve ter pelo menos 3 caracteres');
+      throw new Error("Nome do tenant deve ter pelo menos 3 caracteres");
     }
 
     if (!this._email || !this.validateEmail(this._email)) {
-      throw new Error('Email inválido');
+      throw new Error("Email inválido");
     }
 
     if (!this._slug || !this.validateSlug(this._slug)) {
-      throw new Error('Slug inválido. Use apenas letras minúsculas, números e hífens');
+      throw new Error(
+        "Slug inválido. Use apenas letras minúsculas, números e hífens"
+      );
+    }
+
+    if (!this._password || !this.validatePassword(this._password)) {
+      throw new Error(
+        "Senha inválida. A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma minúscula, um número e um caractere especial."
+      );
     }
 
     if (this._phone && !this.validatePhone(this._phone)) {
-      throw new Error('Telefone inválido');
+      throw new Error("Telefone inválido");
     }
   }
 
@@ -54,13 +64,22 @@ export class TenantEntity {
   }
 
   private validatePhone(phone: string): boolean {
-    const numeroLimpo = phone.replace(/\D/g, '');
+    const numeroLimpo = phone.replace(/\D/g, "");
     const phoneRegex =
       /^(?:(?:\+|00)?(55)\s?)?(?:\(?([1-9][0-9])\)?\s?)?(?:((?:9\d|[2-9])\d{3})[-]?(\d{4}))$/;
     return (
       phoneRegex.test(phone) ||
-      (numeroLimpo.length >= 8 && numeroLimpo.length <= 11 && phoneRegex.test(numeroLimpo))
+      (numeroLimpo.length >= 8 &&
+        numeroLimpo.length <= 11 &&
+        phoneRegex.test(numeroLimpo))
     );
+  }
+
+  private validatePassword(password: string): boolean {
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+
+    return passwordRegex.test(password);
   }
 
   // Getters
@@ -90,5 +109,9 @@ export class TenantEntity {
 
   get address(): string | null {
     return this._address ?? null;
+  }
+
+  get password(): string | null {
+    return this._password ?? null;
   }
 }
