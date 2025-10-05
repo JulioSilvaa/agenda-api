@@ -36,7 +36,7 @@ describe("Unit test DeleteTenant UseCase", () => {
       "Tenant não encontrado"
     );
   });
-  test.skip("should delete multiple tenants independently", async () => {
+  test("should delete multiple tenants independently", async () => {
     const tenantRepository = new TenantRepositoryInMemory();
     const createTenant = new CreateTenant(tenantRepository);
     const deleteTenant = new DeleteTenant(tenantRepository);
@@ -58,7 +58,7 @@ describe("Unit test DeleteTenant UseCase", () => {
     const foundTenant1 = await tenantRepository.findById(tenant1.id!);
     const foundTenant2 = await tenantRepository.findById(tenant2.id!);
 
-    expect(foundTenant1).toBeUndefined();
+    expect(foundTenant1).toBeNull();
     expect(foundTenant2).toBeDefined();
   });
 });
