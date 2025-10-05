@@ -1,18 +1,19 @@
-import { describe, expect, test } from 'vitest';
-import { TenantEntity } from '../../core/entities/TenantEntity';
+import { describe, expect, test } from "vitest";
+import { TenantEntity } from "../../core/entities/TenantEntity";
 
-describe('Unit test TenantEntity', () => {
+describe("Unit test TenantEntity", () => {
   const validTenantData = {
-    name: 'Empresa Teste',
-    email: 'teste@empresa.com',
-    slug: 'empresa-teste',
-    phone: '11999999999',
+    name: "Empresa Teste",
+    email: "teste@empresa.com",
+    slug: "empresa-teste",
+    phone: "11999999999",
     isActive: true,
-    address: 'Rua Teste, 123',
+    address: "Rua Teste, 123",
+    password: "Senha#123",
   };
 
-  describe('Entity Creation', () => {
-    test('should create tenant with valid data', () => {
+  describe("Entity Creation", () => {
+    test("should create tenant with valid data", () => {
       const tenant = TenantEntity.create(validTenantData);
 
       expect(tenant).toBeDefined();
@@ -24,12 +25,13 @@ describe('Unit test TenantEntity', () => {
       expect(tenant.address).toBe(validTenantData.address);
     });
 
-    test('should create tenant without optional fields', () => {
+    test("should create tenant without optional fields", () => {
       const tenant = TenantEntity.create({
-        name: 'Empresa Teste',
-        email: 'teste@empresa.com',
-        slug: 'empresa-teste',
+        name: "Empresa Teste",
+        email: "teste@empresa.com",
+        slug: "empresa-teste",
         isActive: true,
+        password: "Senha#123",
       });
 
       expect(tenant).toBeDefined();
@@ -37,14 +39,15 @@ describe('Unit test TenantEntity', () => {
       expect(tenant.address).toBeNull();
     });
 
-    test('should create tenant with null optional fields', () => {
+    test("should create tenant with null optional fields", () => {
       const tenant = TenantEntity.create({
-        name: 'Empresa Teste',
-        email: 'teste@empresa.com',
-        slug: 'empresa-teste',
+        name: "Empresa Teste",
+        email: "teste@empresa.com",
+        slug: "empresa-teste",
         phone: null,
         address: null,
         isActive: true,
+        password: "Senha#123",
       });
 
       expect(tenant).toBeDefined();
@@ -53,285 +56,299 @@ describe('Unit test TenantEntity', () => {
     });
   });
 
-  describe('Name Validation', () => {
-    test('should reject empty name', () => {
+  describe("Name Validation", () => {
+    test("should reject empty name", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          name: '',
+          name: "",
         })
-      ).toThrow('Nome do tenant deve ter pelo menos 3 caracteres');
+      ).toThrow("Nome do tenant deve ter pelo menos 3 caracteres");
     });
 
-    test('should reject name with only spaces', () => {
+    test("should reject name with only spaces", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          name: '   ',
+          name: "   ",
         })
-      ).toThrow('Nome do tenant deve ter pelo menos 3 caracteres');
+      ).toThrow("Nome do tenant deve ter pelo menos 3 caracteres");
     });
 
-    test('should reject name with less than 3 characters', () => {
+    test("should reject name with less than 3 characters", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          name: 'ab',
+          name: "ab",
         })
-      ).toThrow('Nome do tenant deve ter pelo menos 3 caracteres');
+      ).toThrow("Nome do tenant deve ter pelo menos 3 caracteres");
     });
 
-    test('should accept name with exactly 3 characters', () => {
+    test("should accept name with exactly 3 characters", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
-        name: 'ABC',
+        name: "ABC",
       });
 
-      expect(tenant.name).toBe('ABC');
+      expect(tenant.name).toBe("ABC");
     });
 
-    test('should accept name with spaces', () => {
+    test("should accept name with spaces", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
-        name: 'Empresa de Teste LTDA',
+        name: "Empresa de Teste LTDA",
       });
 
-      expect(tenant.name).toBe('Empresa de Teste LTDA');
+      expect(tenant.name).toBe("Empresa de Teste LTDA");
     });
 
-    test('should accept name with special characters', () => {
+    test("should accept name with special characters", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
-        name: 'Empresa & Cia',
+        name: "Empresa & Cia",
       });
 
-      expect(tenant.name).toBe('Empresa & Cia');
+      expect(tenant.name).toBe("Empresa & Cia");
     });
   });
 
-  describe('Email Validation', () => {
-    test('should accept valid email', () => {
+  describe("Email Validation", () => {
+    test("should accept valid email", () => {
       const tenant = TenantEntity.create(validTenantData);
-      expect(tenant.email).toBe('teste@empresa.com');
+      expect(tenant.email).toBe("teste@empresa.com");
     });
 
-    test('should reject email without @', () => {
+    test("should reject email without @", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          email: 'emailinvalido.com',
+          email: "emailinvalido.com",
         })
-      ).toThrow('Email inválido');
+      ).toThrow("Email inválido");
     });
 
-    test('should reject email without domain', () => {
+    test("should reject email without domain", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          email: 'teste@',
+          email: "teste@",
         })
-      ).toThrow('Email inválido');
+      ).toThrow("Email inválido");
     });
 
-    test('should reject email without local part', () => {
+    test("should reject email without local part", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          email: '@empresa.com',
+          email: "@empresa.com",
         })
-      ).toThrow('Email inválido');
+      ).toThrow("Email inválido");
     });
 
-    test('should reject email with spaces', () => {
+    test("should reject email with spaces", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          email: 'teste @empresa.com',
+          email: "teste @empresa.com",
         })
-      ).toThrow('Email inválido');
+      ).toThrow("Email inválido");
     });
 
-    test('should reject empty email', () => {
+    test("should reject empty email", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          email: '',
+          email: "",
         })
-      ).toThrow('Email inválido');
+      ).toThrow("Email inválido");
     });
 
-    test('should accept email with subdomain', () => {
+    test("should accept email with subdomain", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
-        email: 'teste@mail.empresa.com',
+        email: "teste@mail.empresa.com",
       });
 
-      expect(tenant.email).toBe('teste@mail.empresa.com');
+      expect(tenant.email).toBe("teste@mail.empresa.com");
     });
 
-    test('should accept email with numbers', () => {
+    test("should accept email with numbers", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
-        email: 'teste123@empresa456.com',
+        email: "teste123@empresa456.com",
       });
 
-      expect(tenant.email).toBe('teste123@empresa456.com');
+      expect(tenant.email).toBe("teste123@empresa456.com");
     });
 
-    test('should accept email with plus sign', () => {
+    test("should accept email with plus sign", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
-        email: 'teste+tag@empresa.com',
+        email: "teste+tag@empresa.com",
       });
 
-      expect(tenant.email).toBe('teste+tag@empresa.com');
+      expect(tenant.email).toBe("teste+tag@empresa.com");
     });
   });
 
-  describe('Slug Validation', () => {
-    test('should accept valid slug', () => {
+  describe("Slug Validation", () => {
+    test("should accept valid slug", () => {
       const tenant = TenantEntity.create(validTenantData);
-      expect(tenant.slug).toBe('empresa-teste');
+      expect(tenant.slug).toBe("empresa-teste");
     });
 
-    test('should reject slug with uppercase letters', () => {
+    test("should reject slug with uppercase letters", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          slug: 'Empresa-Teste',
+          slug: "Empresa-Teste",
         })
-      ).toThrow('Slug inválido. Use apenas letras minúsculas, números e hífens');
+      ).toThrow(
+        "Slug inválido. Use apenas letras minúsculas, números e hífens"
+      );
     });
 
-    test('should reject slug with spaces', () => {
+    test("should reject slug with spaces", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          slug: 'empresa teste',
+          slug: "empresa teste",
         })
-      ).toThrow('Slug inválido. Use apenas letras minúsculas, números e hífens');
+      ).toThrow(
+        "Slug inválido. Use apenas letras minúsculas, números e hífens"
+      );
     });
 
-    test('should reject slug with underscores', () => {
+    test("should reject slug with underscores", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          slug: 'empresa_teste',
+          slug: "empresa_teste",
         })
-      ).toThrow('Slug inválido. Use apenas letras minúsculas, números e hífens');
+      ).toThrow(
+        "Slug inválido. Use apenas letras minúsculas, números e hífens"
+      );
     });
 
-    test('should reject slug with special characters', () => {
+    test("should reject slug with special characters", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          slug: 'empresa@teste',
+          slug: "empresa@teste",
         })
-      ).toThrow('Slug inválido. Use apenas letras minúsculas, números e hífens');
+      ).toThrow(
+        "Slug inválido. Use apenas letras minúsculas, números e hífens"
+      );
     });
 
-    test('should reject slug starting with hyphen', () => {
+    test("should reject slug starting with hyphen", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          slug: '-empresa-teste',
+          slug: "-empresa-teste",
         })
-      ).toThrow('Slug inválido. Use apenas letras minúsculas, números e hífens');
+      ).toThrow(
+        "Slug inválido. Use apenas letras minúsculas, números e hífens"
+      );
     });
 
-    test('should reject slug ending with hyphen', () => {
+    test("should reject slug ending with hyphen", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          slug: 'empresa-teste-',
+          slug: "empresa-teste-",
         })
-      ).toThrow('Slug inválido. Use apenas letras minúsculas, números e hífens');
+      ).toThrow(
+        "Slug inválido. Use apenas letras minúsculas, números e hífens"
+      );
     });
 
-    test('should reject slug with consecutive hyphens', () => {
+    test("should reject slug with consecutive hyphens", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          slug: 'empresa--teste',
+          slug: "empresa--teste",
         })
-      ).toThrow('Slug inválido. Use apenas letras minúsculas, números e hífens');
+      ).toThrow(
+        "Slug inválido. Use apenas letras minúsculas, números e hífens"
+      );
     });
 
-    test('should accept slug with numbers', () => {
+    test("should accept slug with numbers", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
-        slug: 'empresa-123-teste',
+        slug: "empresa-123-teste",
       });
 
-      expect(tenant.slug).toBe('empresa-123-teste');
+      expect(tenant.slug).toBe("empresa-123-teste");
     });
 
-    test('should accept slug with only numbers', () => {
+    test("should accept slug with only numbers", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
-        slug: '123456',
+        slug: "123456",
       });
 
-      expect(tenant.slug).toBe('123456');
+      expect(tenant.slug).toBe("123456");
     });
 
-    test('should accept single word slug', () => {
+    test("should accept single word slug", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
-        slug: 'empresa',
+        slug: "empresa",
       });
 
-      expect(tenant.slug).toBe('empresa');
+      expect(tenant.slug).toBe("empresa");
     });
   });
 
-  describe('Phone Validation', () => {
-    test('should accept valid phone without formatting', () => {
+  describe("Phone Validation", () => {
+    test("should accept valid phone without formatting", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
-        phone: '11999999999',
+        phone: "11999999999",
       });
 
-      expect(tenant.phone).toBe('11999999999');
+      expect(tenant.phone).toBe("11999999999");
     });
 
-    test('should accept phone with formatting (11) 99999-9999', () => {
+    test("should accept phone with formatting (11) 99999-9999", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
-        phone: '(11) 99999-9999',
+        phone: "(11) 99999-9999",
       });
 
-      expect(tenant.phone).toBe('(11) 99999-9999');
+      expect(tenant.phone).toBe("(11) 99999-9999");
     });
 
-    test('should accept phone with formatting +55 11 99999-9999', () => {
+    test("should accept phone with formatting +55 11 99999-9999", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
-        phone: '+55 11 99999-9999',
+        phone: "+55 11 99999-9999",
       });
 
-      expect(tenant.phone).toBe('+55 11 99999-9999');
+      expect(tenant.phone).toBe("+55 11 99999-9999");
     });
 
-    test('should accept landline phone', () => {
+    test("should accept landline phone", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
-        phone: '1133334444',
+        phone: "1133334444",
       });
 
-      expect(tenant.phone).toBe('1133334444');
+      expect(tenant.phone).toBe("1133334444");
     });
 
-    test('should accept landline phone with formatting', () => {
+    test("should accept landline phone with formatting", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
-        phone: '(11) 3333-4444',
+        phone: "(11) 3333-4444",
       });
 
-      expect(tenant.phone).toBe('(11) 3333-4444');
+      expect(tenant.phone).toBe("(11) 3333-4444");
     });
 
-    test('should accept null phone', () => {
+    test("should accept null phone", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
         phone: null,
@@ -340,36 +357,36 @@ describe('Unit test TenantEntity', () => {
       expect(tenant.phone).toBeNull();
     });
 
-    test('should reject phone with less than 8 digits', () => {
+    test("should reject phone with less than 8 digits", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          phone: '1234567',
+          phone: "1234567",
         })
-      ).toThrow('Telefone inválido');
+      ).toThrow("Telefone inválido");
     });
 
-    test('should reject phone with more than 11 digits', () => {
+    test("should reject phone with more than 11 digits", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          phone: '119999999999',
+          phone: "119999999999",
         })
-      ).toThrow('Telefone inválido');
+      ).toThrow("Telefone inválido");
     });
 
-    test('should reject phone with letters', () => {
+    test("should reject phone with letters", () => {
       expect(() =>
         TenantEntity.create({
           ...validTenantData,
-          phone: '11abc999999',
+          phone: "11abc999999",
         })
-      ).toThrow('Telefone inválido');
+      ).toThrow("Telefone inválido");
     });
   });
 
-  describe('IsActive Property', () => {
-    test('should create active tenant by default', () => {
+  describe("IsActive Property", () => {
+    test("should create active tenant by default", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
         isActive: true,
@@ -378,7 +395,7 @@ describe('Unit test TenantEntity', () => {
       expect(tenant.isActive).toBe(true);
     });
 
-    test('should create inactive tenant', () => {
+    test("should create inactive tenant", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
         isActive: false,
@@ -388,17 +405,17 @@ describe('Unit test TenantEntity', () => {
     });
   });
 
-  describe('Address Property', () => {
-    test('should accept valid address', () => {
+  describe("Address Property", () => {
+    test("should accept valid address", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
-        address: 'Rua Teste, 123, São Paulo - SP',
+        address: "Rua Teste, 123, São Paulo - SP",
       });
 
-      expect(tenant.address).toBe('Rua Teste, 123, São Paulo - SP');
+      expect(tenant.address).toBe("Rua Teste, 123, São Paulo - SP");
     });
 
-    test('should accept null address', () => {
+    test("should accept null address", () => {
       const tenant = TenantEntity.create({
         ...validTenantData,
         address: null,
@@ -407,9 +424,9 @@ describe('Unit test TenantEntity', () => {
       expect(tenant.address).toBeNull();
     });
 
-    test('should accept long address', () => {
+    test("should accept long address", () => {
       const longAddress =
-        'Rua Muito Longa Com Nome Extenso, 12345, Complemento Apartamento 789, Bairro Teste, Cidade - Estado, CEP 12345-678';
+        "Rua Muito Longa Com Nome Extenso, 12345, Complemento Apartamento 789, Bairro Teste, Cidade - Estado, CEP 12345-678";
 
       const tenant = TenantEntity.create({
         ...validTenantData,
@@ -420,8 +437,8 @@ describe('Unit test TenantEntity', () => {
     });
   });
 
-  describe('Getters', () => {
-    test('should return all properties correctly', () => {
+  describe("Getters", () => {
+    test("should return all properties correctly", () => {
       const tenant = TenantEntity.create(validTenantData);
 
       expect(tenant.id).toBeDefined();
@@ -433,12 +450,13 @@ describe('Unit test TenantEntity', () => {
       expect(tenant.address).toBe(validTenantData.address);
     });
 
-    test('should return null for optional fields when not provided', () => {
+    test("should return null for optional fields when not provided", () => {
       const tenant = TenantEntity.create({
-        name: 'Empresa Teste',
-        email: 'teste@empresa.com',
-        slug: 'empresa-teste',
+        name: "Empresa Teste",
+        email: "teste@empresa.com",
+        slug: "empresa-teste",
         isActive: true,
+        password: "Senha#123",
       });
 
       expect(tenant.phone).toBeNull();
