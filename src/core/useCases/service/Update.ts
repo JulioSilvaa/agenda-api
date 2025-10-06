@@ -26,6 +26,10 @@ export default class UpdateService {
     const updatedService = await this.serviceRepository.create(service);
     const serviceUpdated = await this.serviceRepository.update(updatedService);
 
+    if (!serviceUpdated) {
+      throw new Error("Failed to update service");
+    }
+
     return serviceUpdated;
   }
 }
