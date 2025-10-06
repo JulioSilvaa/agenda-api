@@ -75,6 +75,7 @@ describe("Unit test CreateBooking UseCase", () => {
     const customer = await createCustomer.execute({
       ...validCustomer,
       tenantId,
+      totalBookings: 0,
     });
     customerId = customer.id!;
 
@@ -233,6 +234,7 @@ describe("Unit test CreateBooking UseCase", () => {
         tenantId: tenant2.id!,
         email: "outro@example.com",
         phone: "11977777777",
+        totalBookings: 0,
       });
 
       const bookingData = {
@@ -488,6 +490,7 @@ describe("Unit test CreateBooking UseCase", () => {
         tenantId: tenant2.id!,
         email: "outro@example.com",
         phone: "11977777777",
+        totalBookings: 0,
       });
 
       const booking1 = await createBooking.execute({

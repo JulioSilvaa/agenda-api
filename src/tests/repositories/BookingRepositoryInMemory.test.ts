@@ -88,7 +88,7 @@ describe("Unit test BookingRepositoryInMemory", () => {
       await repository.create(booking);
 
       const updated = BookingEntity.create({
-        id: booking.id,
+        id: booking.id!,
         tenantId: booking.tenantId,
         customerId: booking.customerId ?? undefined,
         serviceId: booking.serviceId ?? undefined,
