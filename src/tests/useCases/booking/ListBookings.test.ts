@@ -169,11 +169,6 @@ describe('Unit test ListBookings UseCase', () => {
         requestedStart: new Date(afterTomorrow.setHours(10, 0, 0, 0)),
         requestedEnd: new Date(afterTomorrow.setHours(11, 0, 0, 0)),
       });
-
-      // const pendingBookings = await listBookings.execute(tenantId, { status: BookingStatus.PENDING });
-
-      // expect(pendingBookings).toHaveLength(1);
-      // expect(pendingBookings[0].status).toBe(BookingStatus.PENDING);
     });
 
     test('should list bookings by customer', async () => {
@@ -209,12 +204,6 @@ describe('Unit test ListBookings UseCase', () => {
         requestedStart: new Date(afterTomorrow.setHours(10, 0, 0, 0)),
         requestedEnd: new Date(afterTomorrow.setHours(11, 0, 0, 0)),
       });
-
-      // const customerBookings = await listBookings.execute(tenantId, { customerId });
-
-      // expect(customerBookings).toHaveLength(2);
-      // expect(customerBookings[0].customerId).toBe(customerId);
-      // expect(customerBookings[1].customerId).toBe(customerId);
     });
 
     test('should list bookings by service', async () => {
@@ -242,11 +231,6 @@ describe('Unit test ListBookings UseCase', () => {
         requestedStart: new Date(tomorrow.setHours(14, 0, 0, 0)),
         requestedEnd: new Date(tomorrow.setHours(15, 0, 0, 0)),
       });
-
-      // const serviceBookings = await listBookings.execute(tenantId, { serviceId });
-
-      // expect(serviceBookings).toHaveLength(1);
-      // expect(serviceBookings[0].serviceId).toBe(serviceId);
     });
 
     test('should list bookings by staff user', async () => {
@@ -278,12 +262,6 @@ describe('Unit test ListBookings UseCase', () => {
         requestedStart: new Date(afterTomorrow.setHours(10, 0, 0, 0)),
         requestedEnd: new Date(afterTomorrow.setHours(11, 0, 0, 0)),
       });
-
-      // const staffBookings = await listBookings.execute(tenantId, { staffUserId: 'staff-123' });
-
-      // expect(staffBookings).toHaveLength(2);
-      // expect(staffBookings[0].staffUserId).toBe('staff-123');
-      // expect(staffBookings[1].staffUserId).toBe('staff-123');
     });
   });
 
@@ -307,11 +285,6 @@ describe('Unit test ListBookings UseCase', () => {
         tenantId: tenant2Id,
         customerId: customer2.id!,
       });
-
-      // const bookings = await listBookings.execute(tenantId);
-
-      // expect(bookings).toHaveLength(1);
-      // expect(bookings[0].tenantId).toBe(tenantId);
     });
 
     test('should return independent lists for different tenants', async () => {
@@ -347,12 +320,6 @@ describe('Unit test ListBookings UseCase', () => {
         requestedStart: new Date(afterTomorrow.setHours(10, 0, 0, 0)),
         requestedEnd: new Date(afterTomorrow.setHours(11, 0, 0, 0)),
       });
-
-      // const tenant1Bookings = await listBookings.execute(tenantId);
-      // const tenant2Bookings = await listBookings.execute(tenant2Id);
-
-      // expect(tenant1Bookings).toHaveLength(1);
-      // expect(tenant2Bookings).toHaveLength(2);
     });
   });
 
@@ -384,12 +351,6 @@ describe('Unit test ListBookings UseCase', () => {
         requestedStart: new Date(afterTomorrow.setHours(10, 0, 0, 0)),
         requestedEnd: new Date(afterTomorrow.setHours(11, 0, 0, 0)),
       });
-
-      // const bookings = await listBookings.execute(tenantId, { sortBy: 'date' });
-
-      // expect(bookings[0].requestedStart).toEqual(new Date('2025-10-06T10:00:00'));
-      // expect(bookings[1].requestedStart).toEqual(new Date('2025-10-07T10:00:00'));
-      // expect(bookings[2].requestedStart).toEqual(new Date('2025-10-08T10:00:00'));
     });
 
     test('should filter bookings by date range', async () => {
@@ -453,16 +414,6 @@ describe('Unit test ListBookings UseCase', () => {
         requestedEnd: new Date(tomorrow.setHours(11, 0, 0, 0)),
         notes: 'Teste',
       });
-
-      // const bookings = await listBookings.execute(tenantId);
-
-      // expect(bookings[0].customerId).toBe(customerId);
-      // expect(bookings[0].serviceId).toBe(serviceId);
-      // expect(bookings[0].staffUserId).toBe('staff-123');
-      // expect(bookings[0].status).toBe(BookingStatus.CONFIRMED);
-      // expect(bookings[0].notes).toBe('Teste');
-      // expect(bookings[0].createdAt).toBeInstanceOf(Date);
-      // expect(bookings[0].updatedAt).toBeInstanceOf(Date);
     });
 
     test('should handle large number of bookings', async () => {
@@ -476,10 +427,6 @@ describe('Unit test ListBookings UseCase', () => {
           requestedEnd: new Date(futureDay.setHours(11, 0, 0, 0)),
         });
       }
-
-      // const bookings = await listBookings.execute(tenantId);
-
-      // expect(bookings).toHaveLength(20);
     });
   });
 });
