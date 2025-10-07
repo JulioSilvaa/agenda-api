@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach } from 'vitest';
 import { BookingRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/BookingRepositoryInMemory';
-import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantyRepositoryInMemory';
+import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantRepositoryInMemory';
 import { CustomerRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/CustomerRepositoryInMemory';
 import { ServiceRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/ServiceRepositoryInMemory';
 import { CreateBooking } from '../../../core/useCases/booking/Create';
@@ -31,6 +31,7 @@ describe.skip('Unit test UpdateBooking UseCase', () => {
     phone: '11999999999',
     isActive: true,
     address: 'Rua Teste, 123',
+    password: 'Senha#123',
   };
 
   const validCustomer = {
@@ -38,6 +39,7 @@ describe.skip('Unit test UpdateBooking UseCase', () => {
     email: 'joao@example.com',
     phone: '11988888888',
     isActive: true,
+    totalBookings: 0,
   };
 
   const validService = {

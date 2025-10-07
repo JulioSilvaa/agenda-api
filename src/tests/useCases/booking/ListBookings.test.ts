@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach } from 'vitest';
 import { BookingRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/BookingRepositoryInMemory';
-import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantyRepositoryInMemory';
+import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantRepositoryInMemory';
 import { CustomerRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/CustomerRepositoryInMemory';
 import { ServiceRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/ServiceRepositoryInMemory';
 import { CreateBooking } from '../../../core/useCases/booking/Create';
@@ -28,8 +28,9 @@ describe.skip('Unit test ListBookings UseCase', () => {
   const validTenant = {
     name: 'Salão de Beleza',
     email: 'salao@example.com',
-    slug: 'salao-beleza',
+    slug: 'salão-beleza',
     phone: '11999999999',
+    password: 'Senha#123',
     isActive: true,
     address: 'Rua Teste, 123',
   };
@@ -39,6 +40,7 @@ describe.skip('Unit test ListBookings UseCase', () => {
     email: 'joao@example.com',
     phone: '11988888888',
     isActive: true,
+    totalBookings: 0,
   };
 
   const validService = {
@@ -78,12 +80,14 @@ describe.skip('Unit test ListBookings UseCase', () => {
       ...validTenant,
       email: 'salao2@example.com',
       slug: 'salao-2',
+      password: '',
     });
     tenant2Id = tenant2.id!;
 
     const customer = await createCustomer.execute({
       ...validCustomer,
       tenantId,
+      totalBookings: 0,
     });
     customerId = customer.id!;
 
@@ -130,7 +134,6 @@ describe.skip('Unit test ListBookings UseCase', () => {
 
     test('should return empty array when tenant has no bookings', async () => {
       // const bookings = await listBookings.execute(tenantId);
-
       // expect(bookings).toHaveLength(0);
       // expect(Array.isArray(bookings)).toBe(true);
     });

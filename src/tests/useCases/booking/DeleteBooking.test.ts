@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach } from 'vitest';
 import { BookingRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/BookingRepositoryInMemory';
-import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantyRepositoryInMemory';
+import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantRepositoryInMemory';
 import { CustomerRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/CustomerRepositoryInMemory';
 import { ServiceRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/ServiceRepositoryInMemory';
 import { CreateBooking } from '../../../core/useCases/booking/Create';
@@ -31,6 +31,7 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
     slug: 'salao-beleza',
     phone: '11999999999',
     isActive: true,
+    password: 'Senha#123',
     address: 'Rua Teste, 123',
   };
 
@@ -39,6 +40,7 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
     email: 'joao@example.com',
     phone: '11988888888',
     isActive: true,
+    totalBookings: 0,
   };
 
   const validService = {
@@ -78,12 +80,14 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
       ...validTenant,
       email: 'salao2@example.com',
       slug: 'salao-2',
+      password: '',
     });
     tenant2Id = tenant2.id!;
 
     const customer = await createCustomer.execute({
       ...validCustomer,
       tenantId,
+      totalBookings: 0,
     });
     customerId = customer.id!;
 

@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach } from 'vitest';
 import { BlockedSlotRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/BlockedSlotRepositoryInMemory';
-import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantyRepositoryInMemory';
+import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantRepositoryInMemory';
 import { DeleteBlockedSlot } from '../../../core/useCases/blockedSlot/Delete';
 import { CreateBlockedSlot } from '../../../core/useCases/blockedSlot/Create';
 import { CreateTenant } from '../../../core/useCases/tenant/Create';

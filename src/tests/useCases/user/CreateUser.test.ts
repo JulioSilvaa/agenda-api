@@ -1,12 +1,12 @@
-import * as bcrypt from "bcryptjs";
-import { describe, expect, test, beforeEach } from "vitest";
-import { UserRepositoryInMemory } from "../../../infra/repositories/repositoryInMemory/UserRepositoryInMemory";
-import { TenantRepositoryInMemory } from "../../../infra/repositories/repositoryInMemory/TenantyRepositoryInMemory";
-import { CreateUser } from "../../../core/useCases/user/Create";
-import { CreateTenant } from "../../../core/useCases/tenant/Create";
-import { UserRole } from "../../../core/interfaces/User";
+import * as bcrypt from 'bcryptjs';
+import { describe, expect, test, beforeEach } from 'vitest';
+import { UserRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/UserRepositoryInMemory';
+import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantRepositoryInMemory';
+import { CreateUser } from '../../../core/useCases/user/Create';
+import { CreateTenant } from '../../../core/useCases/tenant/Create';
+import { UserRole } from '../../../core/interfaces/User';
 
-describe("Unit test CreateUser UseCase", () => {
+describe('Unit test CreateUser UseCase', () => {
   let userRepository: UserRepositoryInMemory;
   let tenantRepository: TenantRepositoryInMemory;
   let createUser: CreateUser;
@@ -14,19 +14,19 @@ describe("Unit test CreateUser UseCase", () => {
   let tenantId: string;
 
   const validTenant = {
-    name: "Empresa Teste",
-    email: "teste@empresa.com",
-    slug: "empresa-teste",
-    phone: "11999999999",
-    password: "Senha#123",
+    name: 'Empresa Teste',
+    email: 'teste@empresa.com',
+    slug: 'empresa-teste',
+    phone: '11999999999',
+    password: 'Senha#123',
     isActive: true,
-    address: "Rua Teste, 123",
+    address: 'Rua Teste, 123',
   };
 
   const validUser = {
-    name: "João Silva",
-    email: "joao@example.com",
-    password: "senha123",
+    name: 'João Silva',
+    email: 'joao@example.com',
+    password: 'senha123',
     role: UserRole.ADMIN,
     isActive: true,
   };
@@ -42,8 +42,8 @@ describe("Unit test CreateUser UseCase", () => {
     tenantId = tenant.id!;
   });
 
-  describe("Successful Creation", () => {
-    test("should create user with all fields", async () => {
+  describe('Successful Creation', () => {
+    test('should create user with all fields', async () => {
       const userData = {
         ...validUser,
         tenantId,
@@ -62,7 +62,7 @@ describe("Unit test CreateUser UseCase", () => {
       expect(createdUser.updatedAt).toBeInstanceOf(Date);
     });
 
-    test("should hash password when creating user", async () => {
+    test('should hash password when creating user', async () => {
       const userData = {
         ...validUser,
         tenantId,
@@ -73,18 +73,15 @@ describe("Unit test CreateUser UseCase", () => {
       expect(createdUser.password).not.toBe(validUser.password);
       expect(createdUser.password.length).toBeGreaterThanOrEqual(60);
 
-      const isPasswordValid = await bcrypt.compare(
-        validUser.password,
-        createdUser.password
-      );
+      const isPasswordValid = await bcrypt.compare(validUser.password, createdUser.password);
       expect(isPasswordValid).toBe(true);
     });
 
-    test("should create user with STAFF role", async () => {
+    test('should create user with STAFF role', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        email: "staff@example.com",
+        email: 'staff@example.com',
         role: UserRole.STAFF,
       };
 
@@ -96,7 +93,7 @@ describe("Unit test CreateUser UseCase", () => {
       expect(createdUser.isAdmin()).toBe(false);
     });
 
-    test("should persist user in repository", async () => {
+    test('should persist user in repository', async () => {
       const userData = {
         ...validUser,
         tenantId,
@@ -104,25 +101,22 @@ describe("Unit test CreateUser UseCase", () => {
 
       await createUser.execute(userData);
 
-      const savedUser = await userRepository.findByEmail(
-        validUser.email,
-        tenantId
-      );
+      const savedUser = await userRepository.findByEmail(validUser.email, tenantId);
       expect(savedUser).toBeDefined();
       expect(savedUser?.email).toBe(validUser.email);
     });
 
-    test("should create multiple users in same tenant", async () => {
+    test('should create multiple users in same tenant', async () => {
       const user1 = await createUser.execute({
         ...validUser,
         tenantId,
-        email: "user1@example.com",
+        email: 'user1@example.com',
       });
 
       const user2 = await createUser.execute({
         ...validUser,
         tenantId,
-        email: "user2@example.com",
+        email: 'user2@example.com',
       });
 
       expect(user1).toBeDefined();
@@ -131,24 +125,24 @@ describe("Unit test CreateUser UseCase", () => {
       expect(user1.tenantId).toBe(user2.tenantId);
     });
 
-    test("should create users with same email in different tenants", async () => {
+    test('should create users with same email in different tenants', async () => {
       // Criar segundo tenant
       const tenant2 = await createTenant.execute({
         ...validTenant,
-        email: "empresa2@example.com",
-        slug: "empresa-2",
+        email: 'empresa2@example.com',
+        slug: 'empresa-2',
       });
 
       const user1 = await createUser.execute({
         ...validUser,
         tenantId,
-        email: "same@example.com",
+        email: 'same@example.com',
       });
 
       const user2 = await createUser.execute({
         ...validUser,
         tenantId: tenant2.id!,
-        email: "same@example.com",
+        email: 'same@example.com',
       });
 
       expect(user1).toBeDefined();
@@ -157,11 +151,11 @@ describe("Unit test CreateUser UseCase", () => {
       expect(user1.tenantId).not.toBe(user2.tenantId);
     });
 
-    test("should create inactive user", async () => {
+    test('should create inactive user', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        email: "inactive@example.com",
+        email: 'inactive@example.com',
         isActive: false,
       };
 
@@ -172,19 +166,17 @@ describe("Unit test CreateUser UseCase", () => {
     });
   });
 
-  describe("Tenant Validation Errors", () => {
-    test("should throw error if tenant does not exist", async () => {
+  describe('Tenant Validation Errors', () => {
+    test('should throw error if tenant does not exist', async () => {
       const userData = {
         ...validUser,
-        tenantId: "tenant-inexistente",
+        tenantId: 'tenant-inexistente',
       };
 
-      await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Tenant não encontrado"
-      );
+      await expect(() => createUser.execute(userData)).rejects.toThrow('Tenant não encontrado');
     });
 
-    test("should throw error for null tenantId", async () => {
+    test('should throw error for null tenantId', async () => {
       const userData = {
         ...validUser,
         tenantId: null as any,
@@ -193,7 +185,7 @@ describe("Unit test CreateUser UseCase", () => {
       await expect(() => createUser.execute(userData)).rejects.toThrow();
     });
 
-    test("should throw error for undefined tenantId", async () => {
+    test('should throw error for undefined tenantId', async () => {
       const userData = {
         ...validUser,
         tenantId: undefined as any,
@@ -202,18 +194,18 @@ describe("Unit test CreateUser UseCase", () => {
       await expect(() => createUser.execute(userData)).rejects.toThrow();
     });
 
-    test("should throw error for empty tenantId", async () => {
+    test('should throw error for empty tenantId', async () => {
       const userData = {
         ...validUser,
-        tenantId: "",
+        tenantId: '',
       };
 
       await expect(() => createUser.execute(userData)).rejects.toThrow();
     });
   });
 
-  describe("Email Uniqueness Validation", () => {
-    test("should not allow duplicate email in same tenant", async () => {
+  describe('Email Uniqueness Validation', () => {
+    test('should not allow duplicate email in same tenant', async () => {
       const userData = {
         ...validUser,
         tenantId,
@@ -222,31 +214,31 @@ describe("Unit test CreateUser UseCase", () => {
       await createUser.execute(userData);
 
       await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Já existe um usuário com este email neste tenant"
+        'Já existe um usuário com este email neste tenant'
       );
     });
 
-    test("should reject duplicate email even with different data in same tenant", async () => {
+    test('should reject duplicate email even with different data in same tenant', async () => {
       await createUser.execute({
         ...validUser,
         tenantId,
       });
 
       const duplicateEmailUser = {
-        name: "Outro Usuário",
+        name: 'Outro Usuário',
         email: validUser.email, // mesmo email
-        password: "outrasenha123",
+        password: 'outrasenha123',
         role: UserRole.STAFF,
         tenantId,
         isActive: true,
       };
 
-      await expect(() =>
-        createUser.execute(duplicateEmailUser)
-      ).rejects.toThrow("Já existe um usuário com este email neste tenant");
+      await expect(() => createUser.execute(duplicateEmailUser)).rejects.toThrow(
+        'Já existe um usuário com este email neste tenant'
+      );
     });
 
-    test("should allow same name but different email in same tenant", async () => {
+    test('should allow same name but different email in same tenant', async () => {
       await createUser.execute({
         ...validUser,
         tenantId,
@@ -255,7 +247,7 @@ describe("Unit test CreateUser UseCase", () => {
       const user2 = await createUser.execute({
         ...validUser,
         tenantId,
-        email: "outro@example.com",
+        email: 'outro@example.com',
       });
 
       expect(user2).toBeDefined();
@@ -263,259 +255,231 @@ describe("Unit test CreateUser UseCase", () => {
     });
   });
 
-  describe("Entity Validation Errors - Name", () => {
-    test("should throw error for empty name", async () => {
+  describe('Entity Validation Errors - Name', () => {
+    test('should throw error for empty name', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        name: "",
+        name: '',
       };
 
-      await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Nome é obrigatório"
-      );
+      await expect(() => createUser.execute(userData)).rejects.toThrow('Nome é obrigatório');
     });
 
-    test("should throw error for name with only spaces", async () => {
+    test('should throw error for name with only spaces', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        name: "   ",
+        name: '   ',
       };
 
-      await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Nome é obrigatório"
-      );
+      await expect(() => createUser.execute(userData)).rejects.toThrow('Nome é obrigatório');
     });
 
-    test("should throw error for name less than 3 characters", async () => {
+    test('should throw error for name less than 3 characters', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        name: "Ab",
+        name: 'Ab',
       };
 
       await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Nome deve ter pelo menos 3 caracteres"
+        'Nome deve ter pelo menos 3 caracteres'
       );
     });
 
-    test("should throw error for name with more than 100 characters", async () => {
+    test('should throw error for name with more than 100 characters', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        name: "a".repeat(101),
+        name: 'a'.repeat(101),
       };
 
       await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Nome não pode ter mais de 100 caracteres"
+        'Nome não pode ter mais de 100 caracteres'
       );
     });
 
-    test("should throw error for null name", async () => {
+    test('should throw error for null name', async () => {
       const userData = {
         ...validUser,
         tenantId,
         name: null as any,
       };
 
-      await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Nome é obrigatório"
-      );
+      await expect(() => createUser.execute(userData)).rejects.toThrow('Nome é obrigatório');
     });
 
-    test("should throw error for undefined name", async () => {
+    test('should throw error for undefined name', async () => {
       const userData = {
         ...validUser,
         tenantId,
         name: undefined as any,
       };
 
-      await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Nome é obrigatório"
-      );
+      await expect(() => createUser.execute(userData)).rejects.toThrow('Nome é obrigatório');
     });
   });
 
-  describe("Entity Validation Errors - Email", () => {
-    test("should throw error for invalid email format", async () => {
+  describe('Entity Validation Errors - Email', () => {
+    test('should throw error for invalid email format', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        email: "emailinvalido",
+        email: 'emailinvalido',
       };
 
-      await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Email inválido"
-      );
+      await expect(() => createUser.execute(userData)).rejects.toThrow('Email inválido');
     });
 
-    test("should throw error for email without @", async () => {
+    test('should throw error for email without @', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        email: "emailexample.com",
+        email: 'emailexample.com',
       };
 
-      await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Email inválido"
-      );
+      await expect(() => createUser.execute(userData)).rejects.toThrow('Email inválido');
     });
 
-    test("should throw error for email without domain", async () => {
+    test('should throw error for email without domain', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        email: "email@",
+        email: 'email@',
       };
 
-      await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Email inválido"
-      );
+      await expect(() => createUser.execute(userData)).rejects.toThrow('Email inválido');
     });
 
-    test("should throw error for empty email", async () => {
+    test('should throw error for empty email', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        email: "",
+        email: '',
       };
 
-      await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Email é obrigatório"
-      );
+      await expect(() => createUser.execute(userData)).rejects.toThrow('Email é obrigatório');
     });
 
-    test("should throw error for email with only spaces", async () => {
+    test('should throw error for email with only spaces', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        email: "   ",
+        email: '   ',
       };
 
-      await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Email é obrigatório"
-      );
+      await expect(() => createUser.execute(userData)).rejects.toThrow('Email é obrigatório');
     });
 
-    test("should throw error for null email", async () => {
+    test('should throw error for null email', async () => {
       const userData = {
         ...validUser,
         tenantId,
         email: null as any,
       };
 
-      await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Email é obrigatório"
-      );
+      await expect(() => createUser.execute(userData)).rejects.toThrow('Email é obrigatório');
     });
 
-    test("should throw error for undefined email", async () => {
+    test('should throw error for undefined email', async () => {
       const userData = {
         ...validUser,
         tenantId,
         email: undefined as any,
       };
 
-      await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Email é obrigatório"
-      );
+      await expect(() => createUser.execute(userData)).rejects.toThrow('Email é obrigatório');
     });
   });
 
-  describe("Entity Validation Errors - Password", () => {
-    test("should throw error for empty password", async () => {
+  describe('Entity Validation Errors - Password', () => {
+    test('should throw error for empty password', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        password: "",
-        email: "testpassword1@example.com",
+        password: '',
+        email: 'testpassword1@example.com',
       };
 
       await expect(() => createUser.execute(userData)).rejects.toThrow();
     });
 
-    test("should throw error for password with only spaces", async () => {
+    test('should throw error for password with only spaces', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        password: "   ",
-        email: "testpassword2@example.com",
+        password: '   ',
+        email: 'testpassword2@example.com',
       };
 
       await expect(() => createUser.execute(userData)).rejects.toThrow();
     });
 
-    test("should throw error for null password", async () => {
+    test('should throw error for null password', async () => {
       const userData = {
         ...validUser,
         tenantId,
         password: null as any,
-        email: "testpassword3@example.com",
+        email: 'testpassword3@example.com',
       };
 
       await expect(() => createUser.execute(userData)).rejects.toThrow();
     });
 
-    test("should throw error for undefined password", async () => {
+    test('should throw error for undefined password', async () => {
       const userData = {
         ...validUser,
         tenantId,
         password: undefined as any,
-        email: "testpassword4@example.com",
+        email: 'testpassword4@example.com',
       };
 
       await expect(() => createUser.execute(userData)).rejects.toThrow();
     });
   });
 
-  describe("Entity Validation Errors - Role", () => {
-    test("should throw error for invalid role", async () => {
+  describe('Entity Validation Errors - Role', () => {
+    test('should throw error for invalid role', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        role: "INVALID_ROLE" as any,
-        email: "testrole1@example.com",
+        role: 'INVALID_ROLE' as any,
+        email: 'testrole1@example.com',
       };
 
-      await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Role inválida"
-      );
+      await expect(() => createUser.execute(userData)).rejects.toThrow('Role inválida');
     });
 
-    test("should throw error for null role", async () => {
+    test('should throw error for null role', async () => {
       const userData = {
         ...validUser,
         tenantId,
         role: null as any,
-        email: "testrole2@example.com",
+        email: 'testrole2@example.com',
       };
 
-      await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Role inválida"
-      );
+      await expect(() => createUser.execute(userData)).rejects.toThrow('Role inválida');
     });
 
-    test("should throw error for undefined role", async () => {
+    test('should throw error for undefined role', async () => {
       const userData = {
         ...validUser,
         tenantId,
         role: undefined as any,
-        email: "testrole3@example.com",
+        email: 'testrole3@example.com',
       };
 
-      await expect(() => createUser.execute(userData)).rejects.toThrow(
-        "Role inválida"
-      );
+      await expect(() => createUser.execute(userData)).rejects.toThrow('Role inválida');
     });
   });
 
-  describe("Entity Validation Errors - Dates", () => {
-    test("should create user with valid dates", async () => {
+  describe('Entity Validation Errors - Dates', () => {
+    test('should create user with valid dates', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        email: "testdates@example.com",
+        email: 'testdates@example.com',
       };
 
       const createdUser = await createUser.execute(userData);
@@ -528,13 +492,13 @@ describe("Unit test CreateUser UseCase", () => {
     });
   });
 
-  describe("Multiple Validation Errors", () => {
-    test("should throw error for multiple invalid fields", async () => {
+  describe('Multiple Validation Errors', () => {
+    test('should throw error for multiple invalid fields', async () => {
       const userData = {
-        name: "ab",
-        email: "emailinvalido",
-        password: "",
-        role: "INVALID" as any,
+        name: 'ab',
+        email: 'emailinvalido',
+        password: '',
+        role: 'INVALID' as any,
         tenantId,
         isActive: true,
       };
@@ -542,13 +506,13 @@ describe("Unit test CreateUser UseCase", () => {
       await expect(() => createUser.execute(userData)).rejects.toThrow();
     });
 
-    test("should throw error for all empty fields", async () => {
+    test('should throw error for all empty fields', async () => {
       const userData = {
-        name: "",
-        email: "",
-        password: "",
+        name: '',
+        email: '',
+        password: '',
         role: null as any,
-        tenantId: "",
+        tenantId: '',
         isActive: true,
       };
 
@@ -556,26 +520,26 @@ describe("Unit test CreateUser UseCase", () => {
     });
   });
 
-  describe("Edge Cases", () => {
-    test("should handle user with exactly 3 characters in name", async () => {
+  describe('Edge Cases', () => {
+    test('should handle user with exactly 3 characters in name', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        name: "abc",
-        email: "abc@example.com",
+        name: 'abc',
+        email: 'abc@example.com',
       };
 
       const createdUser = await createUser.execute(userData);
       expect(createdUser).toBeDefined();
-      expect(createdUser.name).toBe("abc");
+      expect(createdUser.name).toBe('abc');
     });
 
-    test("should handle user with exactly 100 characters in name", async () => {
+    test('should handle user with exactly 100 characters in name', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        name: "a".repeat(100),
-        email: "longname@example.com",
+        name: 'a'.repeat(100),
+        email: 'longname@example.com',
       };
 
       const createdUser = await createUser.execute(userData);
@@ -583,50 +547,47 @@ describe("Unit test CreateUser UseCase", () => {
       expect(createdUser.name.length).toBe(100);
     });
 
-    test("should handle user with special characters in name", async () => {
+    test('should handle user with special characters in name', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        name: "João da Silva Côrrea",
-        email: "special@example.com",
+        name: 'João da Silva Côrrea',
+        email: 'special@example.com',
       };
 
       const createdUser = await createUser.execute(userData);
       expect(createdUser).toBeDefined();
-      expect(createdUser.name).toBe("João da Silva Côrrea");
+      expect(createdUser.name).toBe('João da Silva Côrrea');
     });
 
-    test("should handle email with subdomain", async () => {
+    test('should handle email with subdomain', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        email: "user@mail.company.com.br",
+        email: 'user@mail.company.com.br',
       };
 
       const createdUser = await createUser.execute(userData);
       expect(createdUser).toBeDefined();
-      expect(createdUser.email).toBe("user@mail.company.com.br");
+      expect(createdUser.email).toBe('user@mail.company.com.br');
     });
 
-    test("should handle complex password", async () => {
+    test('should handle complex password', async () => {
       const userData = {
         ...validUser,
         tenantId,
-        email: "complex@example.com",
-        password: "P@ssw0rd!Complex#2024$",
+        email: 'complex@example.com',
+        password: 'P@ssw0rd!Complex#2024$',
       };
 
       const createdUser = await createUser.execute(userData);
       expect(createdUser).toBeDefined();
 
-      const isPasswordValid = await bcrypt.compare(
-        "P@ssw0rd!Complex#2024$",
-        createdUser.password
-      );
+      const isPasswordValid = await bcrypt.compare('P@ssw0rd!Complex#2024$', createdUser.password);
       expect(isPasswordValid).toBe(true);
     });
 
-    test("should handle multiple users created in sequence", async () => {
+    test('should handle multiple users created in sequence', async () => {
       const users = [];
 
       for (let i = 0; i < 5; i++) {
@@ -639,32 +600,26 @@ describe("Unit test CreateUser UseCase", () => {
       }
 
       expect(users.length).toBe(5);
-      const emails = users.map((u) => u.email);
+      const emails = users.map(u => u.email);
       const uniqueEmails = new Set(emails);
       expect(uniqueEmails.size).toBe(5);
     });
 
-    test("should handle user creation with timestamp validation", async () => {
+    test('should handle user creation with timestamp validation', async () => {
       const beforeCreation = new Date();
 
       const userData = {
         ...validUser,
         tenantId,
-        email: "timestamp@example.com",
+        email: 'timestamp@example.com',
       };
 
       const createdUser = await createUser.execute(userData);
       const afterCreation = new Date();
 
-      expect(createdUser.createdAt.getTime()).toBeGreaterThanOrEqual(
-        beforeCreation.getTime()
-      );
-      expect(createdUser.createdAt.getTime()).toBeLessThanOrEqual(
-        afterCreation.getTime()
-      );
-      expect(createdUser.updatedAt.getTime()).toBe(
-        createdUser.createdAt.getTime()
-      );
+      expect(createdUser.createdAt.getTime()).toBeGreaterThanOrEqual(beforeCreation.getTime());
+      expect(createdUser.createdAt.getTime()).toBeLessThanOrEqual(afterCreation.getTime());
+      expect(createdUser.updatedAt.getTime()).toBe(createdUser.createdAt.getTime());
     });
   });
 });
