@@ -1,16 +1,16 @@
 import { describe, expect, test, beforeEach } from 'vitest';
 import { CustomerRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/CustomerRepositoryInMemory';
-import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantyRepositoryInMemory';
+import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantRepositoryInMemory';
 import { CreateCustomer } from '../../../core/useCases/customer/Create';
 import { CreateTenant } from '../../../core/useCases/tenant/Create';
-// import { DeleteCustomer } from '../../../core/useCases/customer/Delete'; // TODO: Implementar
+import { DeleteCustomer } from '../../../core/useCases/customer/Delete';
 
-describe.skip('Unit test DeleteCustomer UseCase', () => {
+describe('Unit test DeleteCustomer UseCase', () => {
   let customerRepository: CustomerRepositoryInMemory;
   let tenantRepository: TenantRepositoryInMemory;
   let createCustomer: CreateCustomer;
   let createTenant: CreateTenant;
-  // let deleteCustomer: DeleteCustomer; // TODO: Implementar
+  let deleteCustomer: DeleteCustomer;
   let tenantId: string;
   let tenant2Id: string;
 
@@ -20,6 +20,7 @@ describe.skip('Unit test DeleteCustomer UseCase', () => {
     slug: 'salao-beleza',
     phone: '11999999999',
     isActive: true,
+    password: 'Senha#123',
     address: 'Rua Teste, 123',
   };
 
@@ -27,6 +28,8 @@ describe.skip('Unit test DeleteCustomer UseCase', () => {
     name: 'João da Silva',
     email: 'joao@example.com',
     phone: '11988888888',
+    notes: 'Cliente VIP',
+    // password: "Senha#123",
     isActive: true,
   };
 
@@ -34,7 +37,7 @@ describe.skip('Unit test DeleteCustomer UseCase', () => {
     customerRepository = new CustomerRepositoryInMemory();
     tenantRepository = new TenantRepositoryInMemory();
     createCustomer = new CreateCustomer(customerRepository, tenantRepository);
-    // deleteCustomer = new DeleteCustomer(customerRepository); // TODO: Implementar
+    deleteCustomer = new DeleteCustomer(customerRepository);
     createTenant = new CreateTenant(tenantRepository);
 
     const tenant = await createTenant.execute(validTenant);
@@ -53,12 +56,13 @@ describe.skip('Unit test DeleteCustomer UseCase', () => {
       const customer = await createCustomer.execute({
         ...validCustomer,
         tenantId,
+        totalBookings: 0,
       });
 
-      // await deleteCustomer.execute(customer.id!, tenantId);
+      await deleteCustomer.execute(customer.id!, tenantId);
 
-      // const foundCustomer = await customerRepository.findById(customer.id!);
-      // expect(foundCustomer).toBeNull();
+      const foundCustomer = await customerRepository.findById(customer.id!);
+      expect(foundCustomer).toBeNull();
     });
 
     test('should remove customer from repository', async () => {
@@ -67,6 +71,7 @@ describe.skip('Unit test DeleteCustomer UseCase', () => {
         tenantId,
         email: 'cliente1@example.com',
         phone: '11988888881',
+        totalBookings: 0,
       });
 
       const customer2 = await createCustomer.execute({
@@ -74,13 +79,14 @@ describe.skip('Unit test DeleteCustomer UseCase', () => {
         tenantId,
         email: 'cliente2@example.com',
         phone: '11988888882',
+        totalBookings: 0,
       });
 
-      // await deleteCustomer.execute(customer1.id!, tenantId);
+      await deleteCustomer.execute(customer1.id!, tenantId);
 
-      // const allCustomers = await customerRepository.findByTenantId(tenantId);
-      // expect(allCustomers.length).toBe(1);
-      // expect(allCustomers[0].id).toBe(customer2.id);
+      const allCustomers = await customerRepository.findByTenantId(tenantId);
+      expect(allCustomers.length).toBe(1);
+      expect(allCustomers[0].id).toBe(customer2.id);
     });
 
     test('should delete multiple customers independently', async () => {
@@ -89,6 +95,7 @@ describe.skip('Unit test DeleteCustomer UseCase', () => {
         tenantId,
         email: 'cliente1@example.com',
         phone: '11988888881',
+        totalBookings: 0,
       });
 
       const customer2 = await createCustomer.execute({
@@ -96,29 +103,30 @@ describe.skip('Unit test DeleteCustomer UseCase', () => {
         tenantId,
         email: 'cliente2@example.com',
         phone: '11988888882',
+        totalBookings: 0,
       });
 
-      // await deleteCustomer.execute(customer1.id!, tenantId);
+      await deleteCustomer.execute(customer1.id!, tenantId);
 
-      // const found1 = await customerRepository.findById(customer1.id!);
-      // const found2 = await customerRepository.findById(customer2.id!);
+      const found1 = await customerRepository.findById(customer1.id!);
+      const found2 = await customerRepository.findById(customer2.id!);
 
-      // expect(found1).toBeNull();
-      // expect(found2).toBeDefined();
+      expect(found1).toBeNull();
+      expect(found2).toBeDefined();
     });
   });
 
   describe('Not Found Errors', () => {
     test('should throw error when customer does not exist', async () => {
-      // await expect(() =>
-      //   deleteCustomer.execute('non-existent-id', tenantId)
-      // ).rejects.toThrow('Cliente não encontrado');
+      await expect(() => deleteCustomer.execute('non-existent-id', tenantId)).rejects.toThrow(
+        'Cliente não encontrado'
+      );
     });
 
     test('should throw error for empty id', async () => {
-      // await expect(() => deleteCustomer.execute('', tenantId)).rejects.toThrow(
-      //   'Cliente não encontrado'
-      // );
+      await expect(() => deleteCustomer.execute('', tenantId)).rejects.toThrow(
+        'Cliente não encontrado'
+      );
     });
   });
 
@@ -127,22 +135,24 @@ describe.skip('Unit test DeleteCustomer UseCase', () => {
       const customer = await createCustomer.execute({
         ...validCustomer,
         tenantId,
+        totalBookings: 0,
       });
 
-      // await expect(() =>
-      //   deleteCustomer.execute(customer.id!, tenant2Id)
-      // ).rejects.toThrow('Cliente não pertence a este tenant');
+      await expect(() => deleteCustomer.execute(customer.id!, tenant2Id)).rejects.toThrow(
+        'Cliente não pertence a este tenant'
+      );
     });
 
     test('should throw error for invalid tenant id', async () => {
       const customer = await createCustomer.execute({
         ...validCustomer,
         tenantId,
+        totalBookings: 0,
       });
 
-      // await expect(() =>
-      //   deleteCustomer.execute(customer.id!, 'wrong-tenant')
-      // ).rejects.toThrow('Cliente não pertence a este tenant');
+      await expect(() => deleteCustomer.execute(customer.id!, 'wrong-tenant')).rejects.toThrow(
+        'Cliente não pertence a este tenant'
+      );
     });
   });
 
@@ -151,6 +161,7 @@ describe.skip('Unit test DeleteCustomer UseCase', () => {
       const customer1 = await createCustomer.execute({
         ...validCustomer,
         tenantId,
+        totalBookings: 0,
       });
 
       const customer2 = await createCustomer.execute({
@@ -158,28 +169,30 @@ describe.skip('Unit test DeleteCustomer UseCase', () => {
         tenantId: tenant2Id,
         email: 'outro@example.com',
         phone: '11977777777',
+        totalBookings: 0,
       });
 
-      // await deleteCustomer.execute(customer1.id!, tenantId);
+      await deleteCustomer.execute(customer1.id!, tenantId);
 
-      // const found1 = await customerRepository.findById(customer1.id!);
-      // const found2 = await customerRepository.findById(customer2.id!);
+      const found1 = await customerRepository.findById(customer1.id!);
+      const found2 = await customerRepository.findById(customer2.id!);
 
-      // expect(found1).toBeNull();
-      // expect(found2).toBeDefined();
+      expect(found1).toBeNull();
+      expect(found2).toBeDefined();
     });
 
     test('should handle deletion of already deleted customer', async () => {
       const customer = await createCustomer.execute({
         ...validCustomer,
         tenantId,
+        totalBookings: 0,
       });
 
-      // await deleteCustomer.execute(customer.id!, tenantId);
+      await deleteCustomer.execute(customer.id!, tenantId);
 
-      // await expect(() =>
-      //   deleteCustomer.execute(customer.id!, tenantId)
-      // ).rejects.toThrow('Cliente não encontrado');
+      await expect(() => deleteCustomer.execute(customer.id!, tenantId)).rejects.toThrow(
+        'Cliente não encontrado'
+      );
     });
 
     test('should delete inactive customer', async () => {
@@ -187,12 +200,13 @@ describe.skip('Unit test DeleteCustomer UseCase', () => {
         ...validCustomer,
         tenantId,
         isActive: false,
+        totalBookings: 0,
       });
 
-      // await deleteCustomer.execute(customer.id!, tenantId);
+      await deleteCustomer.execute(customer.id!, tenantId);
 
-      // const foundCustomer = await customerRepository.findById(customer.id!);
-      // expect(foundCustomer).toBeNull();
+      const foundCustomer = await customerRepository.findById(customer.id!);
+      expect(foundCustomer).toBeNull();
     });
   });
 });
