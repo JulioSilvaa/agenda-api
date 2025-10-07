@@ -20,6 +20,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'joao@example.com',
         phone: '11988888888',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -39,6 +40,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'cliente1@example.com',
         phone: '11988888881',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -50,6 +52,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'cliente2@example.com',
         phone: '11988888882',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -74,6 +77,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'original@example.com',
         phone: '11988888888',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -81,7 +85,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
       await repository.create(customer);
 
       const updated = CustomerEntity.create({
-        id: customer.id,
+        id: customer.id!,
         tenantId: customer.tenantId,
         name: 'Atualizado',
         email: customer.email ?? undefined,
@@ -105,6 +109,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'teste@example.com',
         phone: '11988888888',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -122,6 +127,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'deletar@example.com',
         phone: '11988888888',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -145,6 +151,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'cliente1@example.com',
         phone: '11988888881',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -156,6 +163,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'cliente2@example.com',
         phone: '11988888882',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -182,6 +190,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'teste@example.com',
         phone: '11988888888',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -209,6 +218,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'cliente1@example.com',
         phone: '11988888881',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -220,6 +230,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'cliente2@example.com',
         phone: '11988888882',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -248,6 +259,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'tenant1@example.com',
         phone: '11988888881',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -259,6 +271,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'tenant2@example.com',
         phone: '11988888882',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -285,6 +298,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'joao@example.com',
         phone: '11988888888',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -310,6 +324,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'mesmo@example.com',
         phone: '11988888881',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -321,6 +336,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'mesmo@example.com',
         phone: '11988888882',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -347,6 +363,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'joao@example.com',
         phone: '11988888888',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -372,6 +389,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'cliente1@example.com',
         phone: '11988888888',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -383,6 +401,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'cliente2@example.com',
         phone: '11988888888',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -400,6 +419,39 @@ describe('Unit test CustomerRepositoryInMemory', () => {
     });
   });
 
+  describe('findAll', () => {
+    test('should return all customers', async () => {
+      const customer1 = CustomerEntity.create({
+        id: crypto.randomUUID(),
+        tenantId,
+        name: 'Cliente 1',
+        email: 'cliente1@example.com',
+        phone: '11999999999',
+        isActive: true,
+        totalBookings: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      const customer2 = CustomerEntity.create({
+        id: crypto.randomUUID(),
+        tenantId: tenant2Id,
+        name: 'Cliente 2',
+        email: 'cliente2@example.com',
+        phone: '11988888888',
+        isActive: true,
+        totalBookings: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      await repository.create(customer1);
+      await repository.create(customer2);
+      const all = await repository.findAll();
+      expect(all).toHaveLength(2);
+      expect(all.map((c: typeof customer1) => c.name)).toContain('Cliente 1');
+      expect(all.map((c: typeof customer2) => c.name)).toContain('Cliente 2');
+    });
+  });
+
   describe('Edge Cases', () => {
     test('should handle inactive customers', async () => {
       const customer = CustomerEntity.create({
@@ -409,6 +461,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'inativo@example.com',
         phone: '11988888888',
         isActive: false,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -427,6 +480,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'cliente1@example.com',
         phone: '11988888881',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -438,6 +492,7 @@ describe('Unit test CustomerRepositoryInMemory', () => {
         email: 'cliente2@example.com',
         phone: '11988888882',
         isActive: true,
+        totalBookings: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
