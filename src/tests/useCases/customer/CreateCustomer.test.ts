@@ -1,10 +1,10 @@
-import { describe, expect, test, beforeEach } from "vitest";
-import { CustomerRepositoryInMemory } from "../../../infra/repositories/repositoryInMemory/CustomerRepositoryInMemory";
-import { TenantRepositoryInMemory } from "../../../infra/repositories/repositoryInMemory/TenantyRepositoryInMemory";
-import { CreateCustomer } from "../../../core/useCases/customer/Create";
-import { CreateTenant } from "../../../core/useCases/tenant/Create";
+import { describe, expect, test, beforeEach } from 'vitest';
+import { CustomerRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/CustomerRepositoryInMemory';
+import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantRepositoryInMemory';
+import { CreateCustomer } from '../../../core/useCases/customer/Create';
+import { CreateTenant } from '../../../core/useCases/tenant/Create';
 
-describe("Unit test CreateCustomer UseCase", () => {
+describe('Unit test CreateCustomer UseCase', () => {
   let customerRepository: CustomerRepositoryInMemory;
   let tenantRepository: TenantRepositoryInMemory;
   let createCustomer: CreateCustomer;
@@ -12,19 +12,19 @@ describe("Unit test CreateCustomer UseCase", () => {
   let tenantId: string;
 
   const validTenant = {
-    name: "Salão de Beleza",
-    email: "salao@example.com",
-    slug: "salao-beleza",
-    phone: "11999999999",
-    password: "Senha#123",
+    name: 'Salão de Beleza',
+    email: 'salao@example.com',
+    slug: 'salao-beleza',
+    phone: '11999999999',
+    password: 'Senha#123',
     isActive: true,
-    address: "Rua Teste, 123",
+    address: 'Rua Teste, 123',
   };
 
   const validCustomer = {
-    name: "João da Silva",
-    email: "joao@example.com",
-    phone: "11988888888",
+    name: 'João da Silva',
+    email: 'joao@example.com',
+    phone: '11988888888',
     isActive: true,
   };
 
@@ -38,8 +38,8 @@ describe("Unit test CreateCustomer UseCase", () => {
     tenantId = tenant.id!;
   });
 
-  describe("Successful Creation", () => {
-    test("should create customer with all fields", async () => {
+  describe('Successful Creation', () => {
+    test('should create customer with all fields', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
@@ -59,7 +59,7 @@ describe("Unit test CreateCustomer UseCase", () => {
       expect(createdCustomer.updatedAt).toBeInstanceOf(Date);
     });
 
-    test("should create inactive customer", async () => {
+    test('should create inactive customer', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
@@ -73,20 +73,20 @@ describe("Unit test CreateCustomer UseCase", () => {
       expect(createdCustomer.isActive).toBe(false);
     });
 
-    test("should create multiple customers", async () => {
+    test('should create multiple customers', async () => {
       const customer1 = await createCustomer.execute({
         ...validCustomer,
         tenantId,
-        email: "cliente1@example.com",
-        phone: "11988888881",
+        email: 'cliente1@example.com',
+        phone: '11988888881',
         totalBookings: 0,
       });
 
       const customer2 = await createCustomer.execute({
         ...validCustomer,
         tenantId,
-        email: "cliente2@example.com",
-        phone: "11988888882",
+        email: 'cliente2@example.com',
+        phone: '11988888882',
         totalBookings: 0,
       });
 
@@ -95,7 +95,7 @@ describe("Unit test CreateCustomer UseCase", () => {
       expect(customer1.id).not.toBe(customer2.id);
     });
 
-    test("should persist customer in repository", async () => {
+    test('should persist customer in repository', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
@@ -103,43 +103,39 @@ describe("Unit test CreateCustomer UseCase", () => {
       };
 
       const createdCustomer = await createCustomer.execute(customerData);
-      const foundCustomer = await customerRepository.findById(
-        createdCustomer.id!
-      );
+      const foundCustomer = await customerRepository.findById(createdCustomer.id!);
 
       expect(foundCustomer).toBeDefined();
       expect(foundCustomer?.id).toBe(createdCustomer.id);
     });
   });
 
-  describe("Tenant Validation", () => {
-    test("should throw error if tenant does not exist", async () => {
+  describe('Tenant Validation', () => {
+    test('should throw error if tenant does not exist', async () => {
       const customerData = {
         ...validCustomer,
-        tenantId: "invalid-tenant",
+        tenantId: 'invalid-tenant',
         totalBookings: 0,
       };
 
       await expect(() => createCustomer.execute(customerData)).rejects.toThrow(
-        "Tenant não encontrado"
+        'Tenant não encontrado'
       );
     });
 
-    test("should throw error for empty tenant id", async () => {
+    test('should throw error for empty tenant id', async () => {
       const customerData = {
         ...validCustomer,
-        tenantId: "",
+        tenantId: '',
         totalBookings: 0,
       };
 
-      await expect(() =>
-        createCustomer.execute(customerData)
-      ).rejects.toThrow();
+      await expect(() => createCustomer.execute(customerData)).rejects.toThrow();
     });
   });
 
-  describe("Email Uniqueness Validation", () => {
-    test("should not allow duplicate email in same tenant", async () => {
+  describe('Email Uniqueness Validation', () => {
+    test('should not allow duplicate email in same tenant', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
@@ -151,30 +147,30 @@ describe("Unit test CreateCustomer UseCase", () => {
       await expect(() =>
         createCustomer.execute({
           ...customerData,
-          phone: "11900000000",
+          phone: '11900000000',
           totalBookings: 0,
         })
-      ).rejects.toThrow("Já existe um cliente com este email neste tenant");
+      ).rejects.toThrow('Já existe um cliente com este email neste tenant');
     });
 
-    test("should allow same email in different tenants", async () => {
+    test('should allow same email in different tenants', async () => {
       const tenant2 = await createTenant.execute({
         ...validTenant,
-        email: "salao2@example.com",
-        slug: "salao-2",
+        email: 'salao2@example.com',
+        slug: 'salao-2',
       });
 
       const customer1 = await createCustomer.execute({
         ...validCustomer,
         tenantId,
-        phone: "11988888881",
+        phone: '11988888881',
         totalBookings: 0,
       });
 
       const customer2 = await createCustomer.execute({
         ...validCustomer,
         tenantId: tenant2.id!,
-        phone: "11988888882",
+        phone: '11988888882',
         totalBookings: 0,
       });
 
@@ -185,8 +181,8 @@ describe("Unit test CreateCustomer UseCase", () => {
     });
   });
 
-  describe("Phone Uniqueness Validation", () => {
-    test("should not allow duplicate phone in same tenant", async () => {
+  describe('Phone Uniqueness Validation', () => {
+    test('should not allow duplicate phone in same tenant', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
@@ -198,29 +194,29 @@ describe("Unit test CreateCustomer UseCase", () => {
       await expect(() =>
         createCustomer.execute({
           ...customerData,
-          email: "outro@example.com",
+          email: 'outro@example.com',
         })
-      ).rejects.toThrow("Já existe um cliente com este telefone neste tenant");
+      ).rejects.toThrow('Já existe um cliente com este telefone neste tenant');
     });
 
-    test("should allow same phone in different tenants", async () => {
+    test('should allow same phone in different tenants', async () => {
       const tenant2 = await createTenant.execute({
         ...validTenant,
-        email: "salao2@example.com",
-        slug: "salao-2",
+        email: 'salao2@example.com',
+        slug: 'salao-2',
       });
 
       const customer1 = await createCustomer.execute({
         ...validCustomer,
         tenantId,
-        email: "cliente1@example.com",
+        email: 'cliente1@example.com',
         totalBookings: 0,
       });
 
       const customer2 = await createCustomer.execute({
         ...validCustomer,
         tenantId: tenant2.id!,
-        email: "cliente2@example.com",
+        email: 'cliente2@example.com',
         totalBookings: 0,
       });
 
@@ -230,93 +226,87 @@ describe("Unit test CreateCustomer UseCase", () => {
     });
   });
 
-  describe("Entity Validation Errors - Name", () => {
-    test("should throw error for empty name", async () => {
+  describe('Entity Validation Errors - Name', () => {
+    test('should throw error for empty name', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
-        name: "",
+        name: '',
         totalBookings: 0,
       };
 
       await expect(() => createCustomer.execute(customerData)).rejects.toThrow(
-        "Nome é obrigatório"
+        'Nome é obrigatório'
       );
     });
 
-    test("should throw error for name with only spaces", async () => {
+    test('should throw error for name with only spaces', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
-        name: "   ",
+        name: '   ',
         totalBookings: 0,
       };
 
       await expect(() => createCustomer.execute(customerData)).rejects.toThrow(
-        "Nome é obrigatório"
+        'Nome é obrigatório'
       );
     });
 
-    test("should throw error for name less than 3 characters", async () => {
+    test('should throw error for name less than 3 characters', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
-        name: "Ab",
+        name: 'Ab',
         totalBookings: 0,
       };
 
       await expect(() => createCustomer.execute(customerData)).rejects.toThrow(
-        "Nome deve ter pelo menos 3 caracteres"
+        'Nome deve ter pelo menos 3 caracteres'
       );
     });
 
-    test("should throw error for name longer than 100 characters", async () => {
+    test('should throw error for name longer than 100 characters', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
-        name: "a".repeat(101),
+        name: 'a'.repeat(101),
         totalBookings: 0,
       };
 
       await expect(() => createCustomer.execute(customerData)).rejects.toThrow(
-        "Nome não pode ter mais de 100 caracteres"
+        'Nome não pode ter mais de 100 caracteres'
       );
     });
   });
 
-  describe("Entity Validation Errors - Email", () => {
-    test("should throw error for empty email", async () => {
+  describe('Entity Validation Errors - Email', () => {
+    test('should throw error for empty email', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
-        email: "",
+        email: '',
         totalBookings: 0,
       };
 
       await expect(() => createCustomer.execute(customerData)).rejects.toThrow(
-        "Email não pode ser vazio"
+        'Email é obrigatório'
       );
     });
 
-    test("should throw error for invalid email format", async () => {
+    test('should throw error for invalid email format', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
-        email: "invalid-email",
+        email: 'invalid-email',
         totalBookings: 0,
       };
 
-      await expect(() => createCustomer.execute(customerData)).rejects.toThrow(
-        "Email inválido"
-      );
+      await expect(() => createCustomer.execute(customerData)).rejects.toThrow('Email inválido');
     });
 
-    test("should accept valid email formats", async () => {
-      const validEmails = [
-        "user@example.com",
-        "user.name@example.com",
-        "user+tag@example.co.uk",
-      ];
+    test('should accept valid email formats', async () => {
+      const validEmails = ['user@example.com', 'user.name@example.com', 'user+tag@example.co.uk'];
 
       for (const email of validEmails) {
         const customer = await createCustomer.execute({
@@ -332,35 +322,33 @@ describe("Unit test CreateCustomer UseCase", () => {
     });
   });
 
-  describe("Entity Validation Errors - Phone", () => {
-    test("should throw error for empty phone", async () => {
+  describe('Entity Validation Errors - Phone', () => {
+    test('should throw error for empty phone', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
-        phone: "",
+        phone: '',
         totalBookings: 0,
       };
 
       await expect(() => createCustomer.execute(customerData)).rejects.toThrow(
-        "Telefone é obrigatório"
+        'Telefone é obrigatório'
       );
     });
 
-    test("should throw error for invalid phone format", async () => {
+    test('should throw error for invalid phone format', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
-        phone: "123",
+        phone: '123',
         totalBookings: 0,
       };
 
-      await expect(() => createCustomer.execute(customerData)).rejects.toThrow(
-        "Telefone inválido"
-      );
+      await expect(() => createCustomer.execute(customerData)).rejects.toThrow('Telefone inválido');
     });
 
-    test("should accept valid phone formats", async () => {
-      const validPhones = ["11999999999", "11988888888", "21987654321"];
+    test('should accept valid phone formats', async () => {
+      const validPhones = ['11999999999', '11988888888', '21987654321'];
 
       for (const phone of validPhones) {
         const customer = await createCustomer.execute({
@@ -376,26 +364,26 @@ describe("Unit test CreateCustomer UseCase", () => {
     });
   });
 
-  describe("Edge Cases", () => {
-    test("should handle name with exactly 3 characters", async () => {
+  describe('Edge Cases', () => {
+    test('should handle name with exactly 3 characters', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
-        name: "Ana",
+        name: 'Ana',
         totalBookings: 0,
       };
 
       const createdCustomer = await createCustomer.execute(customerData);
 
       expect(createdCustomer).toBeDefined();
-      expect(createdCustomer.name).toBe("Ana");
+      expect(createdCustomer.name).toBe('Ana');
     });
 
-    test("should handle name with exactly 100 characters", async () => {
+    test('should handle name with exactly 100 characters', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
-        name: "a".repeat(100),
+        name: 'a'.repeat(100),
         totalBookings: 0,
       };
 
@@ -405,32 +393,32 @@ describe("Unit test CreateCustomer UseCase", () => {
       expect(createdCustomer.name.length).toBe(100);
     });
 
-    test("should handle name with special characters", async () => {
+    test('should handle name with special characters', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
-        name: "José da Silva-Júnior",
+        name: 'José da Silva-Júnior',
         totalBookings: 0,
       };
 
       const createdCustomer = await createCustomer.execute(customerData);
 
       expect(createdCustomer).toBeDefined();
-      expect(createdCustomer.name).toBe("José da Silva-Júnior");
+      expect(createdCustomer.name).toBe('José da Silva-Júnior');
     });
 
-    test("should handle email with multiple dots", async () => {
+    test('should handle email with multiple dots', async () => {
       const customerData = {
         ...validCustomer,
         tenantId,
-        email: "user.name.test@example.com",
+        email: 'user.name.test@example.com',
         totalBookings: 0,
       };
 
       const createdCustomer = await createCustomer.execute(customerData);
 
       expect(createdCustomer).toBeDefined();
-      expect(createdCustomer.email).toBe("user.name.test@example.com");
+      expect(createdCustomer.email).toBe('user.name.test@example.com');
     });
   });
 });

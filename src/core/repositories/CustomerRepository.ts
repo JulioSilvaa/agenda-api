@@ -1,6 +1,7 @@
 import { CustomerEntity } from '../entities/CustomerEntity';
 
 export interface ICustomerRepository {
+  findAll(): Promise<CustomerEntity[]>;
   create(customer: CustomerEntity): Promise<CustomerEntity>;
   update(customer: CustomerEntity): Promise<CustomerEntity>;
   delete(id: string): Promise<void>;

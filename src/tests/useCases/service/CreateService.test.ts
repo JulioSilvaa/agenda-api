@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach } from 'vitest';
 import { ServiceRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/ServiceRepositoryInMemory';
-import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantyRepositoryInMemory';
+import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantRepositoryInMemory';
 import { CreateService } from '../../../core/useCases/service/Create';
 import { CreateTenant } from '../../../core/useCases/tenant/Create';
 
@@ -217,9 +217,7 @@ describe('Unit test CreateService UseCase', () => {
         name: '',
       };
 
-      await expect(() => createService.execute(serviceData)).rejects.toThrow(
-        'Nome é obrigatório'
-      );
+      await expect(() => createService.execute(serviceData)).rejects.toThrow('Nome é obrigatório');
     });
 
     test('should throw error for name with only spaces', async () => {
@@ -229,9 +227,7 @@ describe('Unit test CreateService UseCase', () => {
         name: '   ',
       };
 
-      await expect(() => createService.execute(serviceData)).rejects.toThrow(
-        'Nome é obrigatório'
-      );
+      await expect(() => createService.execute(serviceData)).rejects.toThrow('Nome é obrigatório');
     });
 
     test('should throw error for name less than 3 characters', async () => {

@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach } from 'vitest';
 import { BookingRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/BookingRepositoryInMemory';
-import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantyRepositoryInMemory';
+import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantRepositoryInMemory';
 import { CustomerRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/CustomerRepositoryInMemory';
 import { ServiceRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/ServiceRepositoryInMemory';
 import { CreateBooking } from '../../../core/useCases/booking/Create';
@@ -49,8 +49,8 @@ describe('Unit test CreateBooking UseCase', () => {
 
   const validBooking = {
     status: BookingStatus.PENDING,
-    requestedStart: new Date('2025-10-06T10:00:00'),
-    requestedEnd: new Date('2025-10-06T10:30:00'),
+    requestedStart: new Date(Date.now() + 60 * 60 * 1000),
+    requestedEnd: new Date(Date.now() + 90 * 60 * 1000),
     notes: 'Cliente preferencial',
   };
 
@@ -75,6 +75,7 @@ describe('Unit test CreateBooking UseCase', () => {
     const customer = await createCustomer.execute({
       ...validCustomer,
       tenantId,
+      totalBookings: 0,
     });
     customerId = customer.id!;
 
@@ -141,8 +142,8 @@ describe('Unit test CreateBooking UseCase', () => {
         tenantId,
         customerId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T09:00:00'),
-        requestedEnd: new Date('2025-10-06T09:30:00'),
+        requestedStart: new Date(Date.now() + 2 * 60 * 60 * 1000),
+        requestedEnd: new Date(Date.now() + 2.5 * 60 * 60 * 1000),
       });
 
       const confirmed = await createBooking.execute({
@@ -150,8 +151,8 @@ describe('Unit test CreateBooking UseCase', () => {
         tenantId,
         customerId,
         status: BookingStatus.CONFIRMED,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T10:30:00'),
+        requestedStart: new Date(Date.now() + 3 * 60 * 60 * 1000),
+        requestedEnd: new Date(Date.now() + 3.5 * 60 * 60 * 1000),
       });
 
       expect(pending.status).toBe(BookingStatus.PENDING);
@@ -164,8 +165,8 @@ describe('Unit test CreateBooking UseCase', () => {
         customerId,
         serviceId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T10:30:00'),
+        requestedStart: new Date(Date.now() + 4 * 60 * 60 * 1000),
+        requestedEnd: new Date(Date.now() + 4.5 * 60 * 60 * 1000),
       };
 
       const createdBooking = await createBooking.execute(bookingData);
@@ -231,6 +232,7 @@ describe('Unit test CreateBooking UseCase', () => {
         tenantId: tenant2.id!,
         email: 'outro@example.com',
         phone: '11977777777',
+        totalBookings: 0,
       });
 
       const bookingData = {
@@ -288,14 +290,15 @@ describe('Unit test CreateBooking UseCase', () => {
 
   describe('Time Conflict Validation', () => {
     test('should not allow overlapping bookings for same staff', async () => {
+      const now = Date.now();
       await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
         serviceId,
         staffUserId: 'staff-123',
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(now + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 25 * 60 * 60 * 1000),
       });
 
       await expect(() =>
@@ -305,21 +308,22 @@ describe('Unit test CreateBooking UseCase', () => {
           customerId,
           serviceId,
           staffUserId: 'staff-123',
-          requestedStart: new Date('2025-10-06T10:30:00'),
-          requestedEnd: new Date('2025-10-06T11:30:00'),
+          requestedStart: new Date(now + 24.5 * 60 * 60 * 1000),
+          requestedEnd: new Date(now + 25.5 * 60 * 60 * 1000),
         })
       ).rejects.toThrow('Já existe um agendamento neste horário');
     });
 
     test('should allow overlapping bookings for different staff', async () => {
+      const now = Date.now();
       const booking1 = await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
         serviceId,
         staffUserId: 'staff-123',
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(now + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 25 * 60 * 60 * 1000),
       });
 
       const booking2 = await createBooking.execute({
@@ -328,8 +332,8 @@ describe('Unit test CreateBooking UseCase', () => {
         customerId,
         serviceId,
         staffUserId: 'staff-456',
-        requestedStart: new Date('2025-10-06T10:30:00'),
-        requestedEnd: new Date('2025-10-06T11:30:00'),
+        requestedStart: new Date(now + 24.5 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 25.5 * 60 * 60 * 1000),
       });
 
       expect(booking1).toBeDefined();
@@ -337,14 +341,15 @@ describe('Unit test CreateBooking UseCase', () => {
     });
 
     test('should allow consecutive time slots', async () => {
+      const now = Date.now();
       const booking1 = await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
         serviceId,
         staffUserId: 'staff-123',
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(now + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 25 * 60 * 60 * 1000),
       });
 
       const booking2 = await createBooking.execute({
@@ -353,8 +358,8 @@ describe('Unit test CreateBooking UseCase', () => {
         customerId,
         serviceId,
         staffUserId: 'staff-123',
-        requestedStart: new Date('2025-10-06T11:00:00'),
-        requestedEnd: new Date('2025-10-06T12:00:00'),
+        requestedStart: new Date(now + 25 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 26 * 60 * 60 * 1000),
       });
 
       expect(booking1).toBeDefined();
@@ -362,6 +367,7 @@ describe('Unit test CreateBooking UseCase', () => {
     });
 
     test('should allow overlapping with cancelled bookings', async () => {
+      const now = Date.now();
       await createBooking.execute({
         ...validBooking,
         tenantId,
@@ -369,8 +375,8 @@ describe('Unit test CreateBooking UseCase', () => {
         serviceId,
         staffUserId: 'staff-123',
         status: BookingStatus.CANCELLED,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(now + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 25 * 60 * 60 * 1000),
       });
 
       const booking = await createBooking.execute({
@@ -379,8 +385,8 @@ describe('Unit test CreateBooking UseCase', () => {
         customerId,
         serviceId,
         staffUserId: 'staff-123',
-        requestedStart: new Date('2025-10-06T10:30:00'),
-        requestedEnd: new Date('2025-10-06T11:30:00'),
+        requestedStart: new Date(now + 24.5 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 25.5 * 60 * 60 * 1000),
       });
 
       expect(booking).toBeDefined();
@@ -445,14 +451,15 @@ describe('Unit test CreateBooking UseCase', () => {
 
   describe('Edge Cases', () => {
     test('should handle booking on different dates at same time', async () => {
+      const now = Date.now();
       const booking1 = await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
         serviceId,
         staffUserId: 'staff-123',
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(now + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 25 * 60 * 60 * 1000),
       });
 
       const booking2 = await createBooking.execute({
@@ -461,8 +468,8 @@ describe('Unit test CreateBooking UseCase', () => {
         customerId,
         serviceId,
         staffUserId: 'staff-123',
-        requestedStart: new Date('2025-10-07T10:00:00'),
-        requestedEnd: new Date('2025-10-07T11:00:00'),
+        requestedStart: new Date(now + 48 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 49 * 60 * 60 * 1000),
       });
 
       expect(booking1).toBeDefined();
@@ -481,6 +488,7 @@ describe('Unit test CreateBooking UseCase', () => {
         tenantId: tenant2.id!,
         email: 'outro@example.com',
         phone: '11977777777',
+        totalBookings: 0,
       });
 
       const booking1 = await createBooking.execute({
@@ -502,13 +510,14 @@ describe('Unit test CreateBooking UseCase', () => {
     });
 
     test('should accept valid rating values', async () => {
+      const now = Date.now();
       for (let rating = 1; rating <= 5; rating++) {
         const booking = await createBooking.execute({
           ...validBooking,
           tenantId,
           customerId,
-          requestedStart: new Date(`2025-10-0${rating + 5}T10:00:00`),
-          requestedEnd: new Date(`2025-10-0${rating + 5}T11:00:00`),
+          requestedStart: new Date(now + (24 + rating) * 60 * 60 * 1000),
+          requestedEnd: new Date(now + (25 + rating) * 60 * 60 * 1000),
           rating,
         });
 

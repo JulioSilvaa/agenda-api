@@ -39,9 +39,9 @@ export class BookingEntity {
     this.validateTenantId();
     this.validateStatus();
     this.validateDates();
-    this.validateTimeRange();
     this.validateRating();
     this.validateNotes();
+    this.validateTimeRange();
   }
 
   private validateTenantId(): void {
@@ -78,7 +78,7 @@ export class BookingEntity {
     if (this._rating === null || this._rating === undefined) return;
 
     if (this._rating < 1 || this._rating > 5) {
-      throw new Error('Avaliação deve estar entre 1 e 5');
+      throw new Error("Avaliação deve estar entre 1 e 5");
     }
   }
 
@@ -86,7 +86,7 @@ export class BookingEntity {
     if (!this._notes) return;
 
     if (this._notes.length > 1000) {
-      throw new Error('Notas não podem ter mais de 1000 caracteres');
+      throw new Error("Notas não podem ter mais de 1000 caracteres");
     }
   }
 

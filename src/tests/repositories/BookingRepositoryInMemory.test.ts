@@ -1,29 +1,29 @@
-import { describe, expect, test, beforeEach } from 'vitest';
-import { BookingRepositoryInMemory } from '../../infra/repositories/repositoryInMemory/BookingRepositoryInMemory';
-import { BookingEntity } from '../../core/entities/BookingEntity';
-import { BookingStatus } from '../../core/interfaces/Booking';
+import { describe, expect, test, beforeEach } from "vitest";
+import { BookingRepositoryInMemory } from "../../infra/repositories/repositoryInMemory/BookingRepositoryInMemory";
+import { BookingEntity } from "../../core/entities/BookingEntity";
+import { BookingStatus } from "../../core/interfaces/Booking";
 
-describe('Unit test BookingRepositoryInMemory', () => {
+describe("Unit test BookingRepositoryInMemory", () => {
   let repository: BookingRepositoryInMemory;
-  const tenantId = 'tenant-123';
-  const tenant2Id = 'tenant-456';
-  const customerId = 'customer-123';
-  const serviceId = 'service-123';
+  const tenantId = "tenant-123";
+  const tenant2Id = "tenant-456";
+  const customerId = "customer-123";
+  const serviceId = "service-123";
 
   beforeEach(() => {
     repository = new BookingRepositoryInMemory();
   });
 
-  describe('Create', () => {
-    test('should create booking successfully', async () => {
+  describe("Create", () => {
+    test("should create booking successfully", async () => {
       const booking = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         customerId,
         serviceId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(Date.now() + 25 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -35,15 +35,15 @@ describe('Unit test BookingRepositoryInMemory', () => {
       expect(created.status).toBe(BookingStatus.PENDING);
     });
 
-    test('should create multiple bookings', async () => {
+    test("should create multiple bookings", async () => {
       const booking1 = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         customerId,
         serviceId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(Date.now() + 25 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -54,8 +54,8 @@ describe('Unit test BookingRepositoryInMemory', () => {
         customerId,
         serviceId,
         status: BookingStatus.CONFIRMED,
-        requestedStart: new Date('2025-10-06T14:00:00'),
-        requestedEnd: new Date('2025-10-06T15:00:00'),
+        requestedStart: new Date(Date.now() + 26 * 60 * 60 * 1000),
+        requestedEnd: new Date(Date.now() + 27 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -71,16 +71,16 @@ describe('Unit test BookingRepositoryInMemory', () => {
     });
   });
 
-  describe('Update', () => {
-    test('should update booking successfully', async () => {
+  describe("Update", () => {
+    test("should update booking successfully", async () => {
       const booking = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         customerId,
         serviceId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(Date.now() + 25 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -88,7 +88,7 @@ describe('Unit test BookingRepositoryInMemory', () => {
       await repository.create(booking);
 
       const updated = BookingEntity.create({
-        id: booking.id,
+        id: booking.id!,
         tenantId: booking.tenantId,
         customerId: booking.customerId ?? undefined,
         serviceId: booking.serviceId ?? undefined,
@@ -107,33 +107,35 @@ describe('Unit test BookingRepositoryInMemory', () => {
       expect(result.status).toBe(BookingStatus.CONFIRMED);
     });
 
-    test('should throw error when updating non-existent booking', async () => {
+    test("should throw error when updating non-existent booking", async () => {
       const booking = BookingEntity.create({
-        id: 'non-existent',
+        id: "non-existent",
         tenantId,
         customerId,
         serviceId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(Date.now() + 25 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
 
-      await expect(() => repository.update(booking)).rejects.toThrow('Agendamento não encontrado');
+      await expect(() => repository.update(booking)).rejects.toThrow(
+        "Agendamento não encontrado"
+      );
     });
   });
 
-  describe('Delete', () => {
-    test('should delete booking successfully', async () => {
+  describe("Delete", () => {
+    test("should delete booking successfully", async () => {
       const booking = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         customerId,
         serviceId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(Date.now() + 25 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -145,21 +147,21 @@ describe('Unit test BookingRepositoryInMemory', () => {
       expect(found).toBeNull();
     });
 
-    test('should not throw error when deleting non-existent booking', async () => {
-      await expect(repository.delete('non-existent')).resolves.not.toThrow();
+    test("should not throw error when deleting non-existent booking", async () => {
+      await expect(repository.delete("non-existent")).resolves.not.toThrow();
     });
   });
 
-  describe('FindById', () => {
-    test('should find booking by id', async () => {
+  describe("FindById", () => {
+    test("should find booking by id", async () => {
       const booking = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         customerId,
         serviceId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(Date.now() + 25 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -171,22 +173,22 @@ describe('Unit test BookingRepositoryInMemory', () => {
       expect(found?.id).toBe(booking.id);
     });
 
-    test('should return null when booking not found', async () => {
-      const found = await repository.findById('non-existent');
+    test("should return null when booking not found", async () => {
+      const found = await repository.findById("non-existent");
       expect(found).toBeNull();
     });
   });
 
-  describe('FindByTenantId', () => {
-    test('should find all bookings for a tenant', async () => {
+  describe("FindByTenantId", () => {
+    test("should find all bookings for a tenant", async () => {
       const booking1 = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         customerId,
         serviceId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(Date.now() + 25 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -197,8 +199,8 @@ describe('Unit test BookingRepositoryInMemory', () => {
         customerId,
         serviceId,
         status: BookingStatus.CONFIRMED,
-        requestedStart: new Date('2025-10-06T14:00:00'),
-        requestedEnd: new Date('2025-10-06T15:00:00'),
+        requestedStart: new Date(Date.now() + 26 * 60 * 60 * 1000),
+        requestedEnd: new Date(Date.now() + 27 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -213,21 +215,22 @@ describe('Unit test BookingRepositoryInMemory', () => {
       expect(bookings[1].tenantId).toBe(tenantId);
     });
 
-    test('should return empty array when tenant has no bookings', async () => {
-      const bookings = await repository.findByTenantId('empty-tenant');
+    test("should return empty array when tenant has no bookings", async () => {
+      const bookings = await repository.findByTenantId("empty-tenant");
       expect(bookings).toHaveLength(0);
       expect(Array.isArray(bookings)).toBe(true);
     });
 
-    test('should isolate bookings by tenant', async () => {
+    test("should isolate bookings by tenant", async () => {
+      const now = Date.now();
       const booking1 = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         customerId,
         serviceId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(now + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 25 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -238,8 +241,8 @@ describe('Unit test BookingRepositoryInMemory', () => {
         customerId,
         serviceId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(now + 26 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 27 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -255,18 +258,19 @@ describe('Unit test BookingRepositoryInMemory', () => {
     });
   });
 
-  describe('FindByCustomerId', () => {
-    test('should find bookings by customer', async () => {
-      const customer2Id = 'customer-456';
+  describe("FindByCustomerId", () => {
+    test("should find bookings by customer", async () => {
+      const customer2Id = "customer-456";
 
+      const now = Date.now();
       const booking1 = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         customerId,
         serviceId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(now + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 25 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -277,8 +281,8 @@ describe('Unit test BookingRepositoryInMemory', () => {
         customerId: customer2Id,
         serviceId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T14:00:00'),
-        requestedEnd: new Date('2025-10-06T15:00:00'),
+        requestedStart: new Date(now + 26 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 27 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -286,30 +290,37 @@ describe('Unit test BookingRepositoryInMemory', () => {
       await repository.create(booking1);
       await repository.create(booking2);
 
-      const customerBookings = await repository.findByCustomerId(customerId, tenantId);
+      const customerBookings = await repository.findByCustomerId(
+        customerId,
+        tenantId
+      );
 
       expect(customerBookings).toHaveLength(1);
       expect(customerBookings[0].customerId).toBe(customerId);
     });
 
-    test('should return empty array when customer has no bookings', async () => {
-      const bookings = await repository.findByCustomerId('non-existent', tenantId);
+    test("should return empty array when customer has no bookings", async () => {
+      const bookings = await repository.findByCustomerId(
+        "non-existent",
+        tenantId
+      );
       expect(bookings).toHaveLength(0);
     });
   });
 
-  describe('FindByServiceId', () => {
-    test('should find bookings by service', async () => {
-      const service2Id = 'service-456';
+  describe("FindByServiceId", () => {
+    test("should find bookings by service", async () => {
+      const service2Id = "service-456";
 
+      const now = Date.now();
       const booking1 = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         customerId,
         serviceId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(now + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 25 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -320,8 +331,8 @@ describe('Unit test BookingRepositoryInMemory', () => {
         customerId,
         serviceId: service2Id,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T14:00:00'),
-        requestedEnd: new Date('2025-10-06T15:00:00'),
+        requestedStart: new Date(now + 26 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 27 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -329,24 +340,28 @@ describe('Unit test BookingRepositoryInMemory', () => {
       await repository.create(booking1);
       await repository.create(booking2);
 
-      const serviceBookings = await repository.findByServiceId(serviceId, tenantId);
+      const serviceBookings = await repository.findByServiceId(
+        serviceId,
+        tenantId
+      );
 
       expect(serviceBookings).toHaveLength(1);
       expect(serviceBookings[0].serviceId).toBe(serviceId);
     });
   });
 
-  describe('FindByStaffUserId', () => {
-    test('should find bookings by staff user', async () => {
+  describe("FindByStaffUserId", () => {
+    test("should find bookings by staff user", async () => {
+      const now = Date.now();
       const booking1 = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         customerId,
         serviceId,
-        staffUserId: 'staff-123',
+        staffUserId: "staff-123",
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(now + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 25 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -356,10 +371,10 @@ describe('Unit test BookingRepositoryInMemory', () => {
         tenantId,
         customerId,
         serviceId,
-        staffUserId: 'staff-456',
+        staffUserId: "staff-456",
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T14:00:00'),
-        requestedEnd: new Date('2025-10-06T15:00:00'),
+        requestedStart: new Date(now + 26 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 27 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -367,23 +382,27 @@ describe('Unit test BookingRepositoryInMemory', () => {
       await repository.create(booking1);
       await repository.create(booking2);
 
-      const staffBookings = await repository.findByStaffUserId('staff-123', tenantId);
+      const staffBookings = await repository.findByStaffUserId(
+        "staff-123",
+        tenantId
+      );
 
       expect(staffBookings).toHaveLength(1);
-      expect(staffBookings[0].staffUserId).toBe('staff-123');
+      expect(staffBookings[0].staffUserId).toBe("staff-123");
     });
   });
 
-  describe('FindByStatus', () => {
-    test('should find bookings by status', async () => {
+  describe("FindByStatus", () => {
+    test("should find bookings by status", async () => {
+      const now = Date.now();
       const booking1 = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         customerId,
         serviceId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(now + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 25 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -394,8 +413,8 @@ describe('Unit test BookingRepositoryInMemory', () => {
         customerId,
         serviceId,
         status: BookingStatus.CONFIRMED,
-        requestedStart: new Date('2025-10-06T14:00:00'),
-        requestedEnd: new Date('2025-10-06T15:00:00'),
+        requestedStart: new Date(now + 26 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 27 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -403,24 +422,28 @@ describe('Unit test BookingRepositoryInMemory', () => {
       await repository.create(booking1);
       await repository.create(booking2);
 
-      const pendingBookings = await repository.findByStatus(BookingStatus.PENDING, tenantId);
+      const pendingBookings = await repository.findByStatus(
+        BookingStatus.PENDING,
+        tenantId
+      );
 
       expect(pendingBookings).toHaveLength(1);
       expect(pendingBookings[0].status).toBe(BookingStatus.PENDING);
     });
   });
 
-  describe('FindConflictingBookings', () => {
-    test('should find overlapping bookings', async () => {
+  describe("FindConflictingBookings", () => {
+    test("should find overlapping bookings", async () => {
+      const now = Date.now();
       const booking = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         customerId,
         serviceId,
-        staffUserId: 'staff-123',
+        staffUserId: "staff-123",
         status: BookingStatus.CONFIRMED,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T12:00:00'),
+        requestedStart: new Date(now + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 26 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -429,25 +452,26 @@ describe('Unit test BookingRepositoryInMemory', () => {
 
       const conflicts = await repository.findConflictingBookings(
         tenantId,
-        new Date('2025-10-06T11:00:00'),
-        new Date('2025-10-06T13:00:00'),
-        'staff-123'
+        new Date(now + 25 * 60 * 60 * 1000),
+        new Date(now + 27 * 60 * 60 * 1000),
+        "staff-123"
       );
 
       expect(conflicts).toHaveLength(1);
       expect(conflicts[0].id).toBe(booking.id);
     });
 
-    test('should not find conflicts on different staff', async () => {
+    test("should not find conflicts on different staff", async () => {
+      const now = Date.now();
       const booking = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         customerId,
         serviceId,
-        staffUserId: 'staff-123',
+        staffUserId: "staff-123",
         status: BookingStatus.CONFIRMED,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T12:00:00'),
+        requestedStart: new Date(now + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 26 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -456,24 +480,25 @@ describe('Unit test BookingRepositoryInMemory', () => {
 
       const conflicts = await repository.findConflictingBookings(
         tenantId,
-        new Date('2025-10-06T11:00:00'),
-        new Date('2025-10-06T13:00:00'),
-        'staff-456'
+        new Date(now + 25 * 60 * 60 * 1000),
+        new Date(now + 27 * 60 * 60 * 1000),
+        "staff-456"
       );
 
       expect(conflicts).toHaveLength(0);
     });
 
-    test('should ignore cancelled bookings in conflict check', async () => {
+    test("should ignore cancelled bookings in conflict check", async () => {
+      const now = Date.now();
       const booking = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         customerId,
         serviceId,
-        staffUserId: 'staff-123',
+        staffUserId: "staff-123",
         status: BookingStatus.CANCELLED,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T12:00:00'),
+        requestedStart: new Date(now + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 26 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -482,24 +507,25 @@ describe('Unit test BookingRepositoryInMemory', () => {
 
       const conflicts = await repository.findConflictingBookings(
         tenantId,
-        new Date('2025-10-06T11:00:00'),
-        new Date('2025-10-06T13:00:00'),
-        'staff-123'
+        new Date(now + 25 * 60 * 60 * 1000),
+        new Date(now + 27 * 60 * 60 * 1000),
+        "staff-123"
       );
 
       expect(conflicts).toHaveLength(0);
     });
 
-    test('should not find conflicts for consecutive time slots', async () => {
+    test("should not find conflicts for consecutive time slots", async () => {
+      const now = Date.now();
       const booking = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         customerId,
         serviceId,
-        staffUserId: 'staff-123',
+        staffUserId: "staff-123",
         status: BookingStatus.CONFIRMED,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T12:00:00'),
+        requestedStart: new Date(now + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 26 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -508,23 +534,24 @@ describe('Unit test BookingRepositoryInMemory', () => {
 
       const conflicts = await repository.findConflictingBookings(
         tenantId,
-        new Date('2025-10-06T12:00:00'),
-        new Date('2025-10-06T14:00:00'),
-        'staff-123'
+        new Date(now + 26 * 60 * 60 * 1000),
+        new Date(now + 28 * 60 * 60 * 1000),
+        "staff-123"
       );
 
       expect(conflicts).toHaveLength(0);
     });
   });
 
-  describe('Edge Cases', () => {
-    test('should handle bookings with optional fields', async () => {
+  describe("Edge Cases", () => {
+    test("should handle bookings with optional fields", async () => {
+      const now = Date.now();
       const booking = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(now + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 25 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -537,15 +564,16 @@ describe('Unit test BookingRepositoryInMemory', () => {
       expect(found?.staffUserId).toBeUndefined();
     });
 
-    test('should maintain booking list after multiple operations', async () => {
+    test("should maintain booking list after multiple operations", async () => {
+      const now = Date.now();
       const booking1 = BookingEntity.create({
         id: crypto.randomUUID(),
         tenantId,
         customerId,
         serviceId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(now + 24 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 25 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -556,8 +584,8 @@ describe('Unit test BookingRepositoryInMemory', () => {
         customerId,
         serviceId,
         status: BookingStatus.CONFIRMED,
-        requestedStart: new Date('2025-10-06T14:00:00'),
-        requestedEnd: new Date('2025-10-06T15:00:00'),
+        requestedStart: new Date(now + 26 * 60 * 60 * 1000),
+        requestedEnd: new Date(now + 27 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });

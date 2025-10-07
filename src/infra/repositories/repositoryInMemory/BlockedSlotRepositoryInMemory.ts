@@ -1,8 +1,20 @@
-import { BlockedSlotEntity } from '../../../core/entities/BlockedSlotEntity';
-import { IBlockedSlotRepository } from '../../../core/repositories/BlockedSlotRepository';
+import { BlockedSlotEntity } from "../../../core/entities/BlockedSlotEntity";
+import { IBlockedSlotRepository } from "../../../core/repositories/BlockedSlotRepository";
 
 export class BlockedSlotRepositoryInMemory implements IBlockedSlotRepository {
+  async findByStaffUserId(
+    staffUserId: string,
+    tenantId: string
+  ): Promise<BlockedSlotEntity[]> {
+    return this.blockedSlots.filter(
+      (slot) => slot.staffUserId === staffUserId && slot.tenantId === tenantId
+    );
+  }
   private blockedSlots: BlockedSlotEntity[] = [];
+
+  async findAll(): Promise<BlockedSlotEntity[]> {
+    return this.blockedSlots;
+  }
 
   async create(blockedSlot: BlockedSlotEntity): Promise<BlockedSlotEntity> {
     this.blockedSlots.push(blockedSlot);
@@ -10,44 +22,35 @@ export class BlockedSlotRepositoryInMemory implements IBlockedSlotRepository {
   }
 
   async delete(id: string): Promise<void> {
-    this.blockedSlots = this.blockedSlots.filter(slot => slot.id !== id);
+    this.blockedSlots = this.blockedSlots.filter((slot) => slot.id !== id);
   }
 
   async findById(id: string): Promise<BlockedSlotEntity | null> {
-    const slot = this.blockedSlots.find(s => s.id === id);
+    const slot = this.blockedSlots.find((s) => s.id === id);
     return slot ? slot : null;
   }
 
   async findByTenantId(tenantId: string): Promise<BlockedSlotEntity[]> {
-    return this.blockedSlots.filter(slot => slot.tenantId === tenantId);
+    return this.blockedSlots.filter((slot) => slot.tenantId === tenantId);
   }
 
-  async findByStaffUserId(staffUserId: string, tenantId: string): Promise<BlockedSlotEntity[]> {
-    return this.blockedSlots.filter(
-      slot => slot.staffUserId === staffUserId && slot.tenantId === tenantId
-    );
-  }
-
+  // Removido método duplicado findByStaffUserId
   async findByTimeRange(
     tenantId: string,
     startTime: Date,
     endTime: Date,
     staffUserId?: string
   ): Promise<BlockedSlotEntity[]> {
-    return this.blockedSlots.filter(slot => {
-      // Filtrar por tenant
+    return this.blockedSlots.filter((slot) => {
       if (slot.tenantId !== tenantId) return false;
-
-      // Filtrar por staff se fornecido
-      if (staffUserId && slot.staffUserId !== staffUserId && slot.staffUserId !== null) {
+      if (
+        staffUserId !== undefined &&
+        staffUserId !== null &&
+        slot.staffUserId !== staffUserId
+      )
         return false;
-      }
-
-      // Verificar se há overlap de tempo
-      // Overlap ocorre se: startTime < slot.endTime && endTime > slot.startTime
-      const hasOverlap = startTime < slot.endTime && endTime > slot.startTime;
-
-      return hasOverlap;
+      // Lógica de sobreposição exclusiva
+      return slot.startTime < endTime && slot.endTime > startTime;
     });
   }
 }

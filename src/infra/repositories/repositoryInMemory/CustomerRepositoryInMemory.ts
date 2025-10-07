@@ -2,6 +2,9 @@ import { CustomerEntity } from '../../../core/entities/CustomerEntity';
 import { ICustomerRepository } from '../../../core/repositories/CustomerRepository';
 
 export class CustomerRepositoryInMemory implements ICustomerRepository {
+  async findAll(): Promise<CustomerEntity[]> {
+    return [...this.customers];
+  }
   private customers: CustomerEntity[] = [];
 
   async create(customer: CustomerEntity): Promise<CustomerEntity> {

@@ -22,6 +22,9 @@ export class CreateCustomer {
     }
 
     // Validar se já existe um cliente com o mesmo email no tenant
+    if (!data.email) {
+      throw new Error('Email é obrigatório');
+    }
     const existingCustomerByEmail = await this.customerRepository.findByEmail(
       data.email,
       data.tenantId

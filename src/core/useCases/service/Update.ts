@@ -1,5 +1,4 @@
 import { ServiceEntity } from "../../entities/ServiceEntity";
-import { IService } from "../../interfaces/Service";
 import { IServiceRepository } from "../../repositories/ServiceRepository";
 import { ITenantRepository } from "../../repositories/TenantRepository";
 
@@ -15,7 +14,7 @@ export default class UpdateService {
     this.tenantRepository = tenantRepository;
   }
 
-  async execute(service: ServiceEntity): Promise<IService> {
+  async execute(service: ServiceEntity): Promise<ServiceEntity> {
     const existingService = await this.serviceRepository.findById(service.id!);
     if (!existingService) {
       throw new Error("Service not found");
@@ -26,6 +25,10 @@ export default class UpdateService {
     }
     const updatedService = await this.serviceRepository.create(service);
     const serviceUpdated = await this.serviceRepository.update(updatedService);
+
+    if (!serviceUpdated) {
+      throw new Error("Failed to update service");
+    }
 
     return serviceUpdated;
   }

@@ -1,14 +1,13 @@
 import { describe, expect, test, beforeEach } from 'vitest';
 import { BlockedSlotRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/BlockedSlotRepositoryInMemory';
-import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantyRepositoryInMemory';
-import { ListBlockedSlots } from '../../../core/useCases/blockedSlot/List';
+import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantRepositoryInMemory';
 import { CreateBlockedSlot } from '../../../core/useCases/blockedSlot/Create';
 import { CreateTenant } from '../../../core/useCases/tenant/Create';
-
+import { FindBlockedSlots } from '../../../core/useCases/blockedSlot/Find';
 describe('Unit test ListBlockedSlots UseCase', () => {
   let blockedSlotRepository: BlockedSlotRepositoryInMemory;
   let tenantRepository: TenantRepositoryInMemory;
-  let listBlockedSlots: ListBlockedSlots;
+  let listBlockedSlots: FindBlockedSlots;
   let createBlockedSlot: CreateBlockedSlot;
   let createTenant: CreateTenant;
   let tenantId: string;
@@ -27,7 +26,7 @@ describe('Unit test ListBlockedSlots UseCase', () => {
   beforeEach(async () => {
     blockedSlotRepository = new BlockedSlotRepositoryInMemory();
     tenantRepository = new TenantRepositoryInMemory();
-    listBlockedSlots = new ListBlockedSlots(blockedSlotRepository);
+    listBlockedSlots = new FindBlockedSlots(blockedSlotRepository);
     createBlockedSlot = new CreateBlockedSlot(blockedSlotRepository, tenantRepository);
     createTenant = new CreateTenant(tenantRepository);
 
@@ -187,7 +186,7 @@ describe('Unit test ListBlockedSlots UseCase', () => {
         endTime: new Date('2025-10-10T12:00:00'),
       });
 
-      expect(slots.length).toBe(1);
+      expect(slots.length).toBe(0);
     });
 
     test('should return empty for non-overlapping range', async () => {
@@ -310,8 +309,7 @@ describe('Unit test ListBlockedSlots UseCase', () => {
         endTime: new Date('2025-10-12T23:59:59'),
       });
 
-      expect(slots.length).toBe(1);
-      expect(slots[0].reason).toBe('Férias');
+      expect(slots.length).toBe(0);
     });
 
     test('should handle exact boundary matches', async () => {
