@@ -8,9 +8,9 @@ import { CreateTenant } from '../../../core/useCases/tenant/Create';
 import { CreateCustomer } from '../../../core/useCases/customer/Create';
 import { CreateService } from '../../../core/useCases/service/Create';
 import { BookingStatus } from '../../../core/interfaces/Booking';
-// import { ListBookings } from '../../../core/useCases/booking/List'; // TODO: Implementar
+import ListBookings from './../../../core/useCases/booking/List';
 
-describe.skip('Unit test ListBookings UseCase', () => {
+describe('Unit test ListBookings UseCase', () => {
   let bookingRepository: BookingRepositoryInMemory;
   let tenantRepository: TenantRepositoryInMemory;
   let customerRepository: CustomerRepositoryInMemory;
@@ -19,7 +19,7 @@ describe.skip('Unit test ListBookings UseCase', () => {
   let createTenant: CreateTenant;
   let createCustomer: CreateCustomer;
   let createService: CreateService;
-  // let listBookings: ListBookings; // TODO: Implementar
+  let listBookings: ListBookings;
   let tenantId: string;
   let tenant2Id: string;
   let customerId: string;
@@ -28,7 +28,7 @@ describe.skip('Unit test ListBookings UseCase', () => {
   const validTenant = {
     name: 'Salão de Beleza',
     email: 'salao@example.com',
-    slug: 'salão-beleza',
+    slug: 'salao-beleza',
     phone: '11999999999',
     password: 'Senha#123',
     isActive: true,
@@ -53,8 +53,8 @@ describe.skip('Unit test ListBookings UseCase', () => {
 
   const validBooking = {
     status: BookingStatus.PENDING,
-    requestedStart: new Date('2025-10-06T10:00:00'),
-    requestedEnd: new Date('2025-10-06T10:30:00'),
+    requestedStart: new Date(Date.now() + 24 * 60 * 60 * 1000), // amanhã 10:00
+    requestedEnd: new Date(Date.now() + 24 * 60 * 60 * 1000 + 30 * 60 * 1000), // amanhã 10:30
   };
 
   beforeEach(async () => {
@@ -68,7 +68,7 @@ describe.skip('Unit test ListBookings UseCase', () => {
       customerRepository,
       serviceRepository
     );
-    // listBookings = new ListBookings(bookingRepository); // TODO: Implementar
+    listBookings = new ListBookings(bookingRepository, tenantRepository);
     createTenant = new CreateTenant(tenantRepository);
     createCustomer = new CreateCustomer(customerRepository, tenantRepository);
     createService = new CreateService(serviceRepository, tenantRepository);
@@ -80,7 +80,7 @@ describe.skip('Unit test ListBookings UseCase', () => {
       ...validTenant,
       email: 'salao2@example.com',
       slug: 'salao-2',
-      password: '',
+      password: 'Senha#123',
     });
     tenant2Id = tenant2.id!;
 
@@ -100,13 +100,15 @@ describe.skip('Unit test ListBookings UseCase', () => {
 
   describe('Successful Listing', () => {
     test('should list all bookings for a tenant', async () => {
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const afterTomorrow = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
       await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
         serviceId,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(tomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(11, 0, 0, 0)),
       });
 
       await createBooking.execute({
@@ -114,8 +116,8 @@ describe.skip('Unit test ListBookings UseCase', () => {
         tenantId,
         customerId,
         serviceId,
-        requestedStart: new Date('2025-10-06T14:00:00'),
-        requestedEnd: new Date('2025-10-06T15:00:00'),
+        requestedStart: new Date(tomorrow.setHours(14, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(15, 0, 0, 0)),
       });
 
       await createBooking.execute({
@@ -123,29 +125,31 @@ describe.skip('Unit test ListBookings UseCase', () => {
         tenantId,
         customerId,
         serviceId,
-        requestedStart: new Date('2025-10-07T10:00:00'),
-        requestedEnd: new Date('2025-10-07T11:00:00'),
+        requestedStart: new Date(afterTomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(afterTomorrow.setHours(11, 0, 0, 0)),
       });
 
-      // const bookings = await listBookings.execute(tenantId);
+      const bookings = await listBookings.execute(tenantId);
 
-      // expect(bookings).toHaveLength(3);
+      expect(bookings).toHaveLength(3);
     });
 
     test('should return empty array when tenant has no bookings', async () => {
-      // const bookings = await listBookings.execute(tenantId);
-      // expect(bookings).toHaveLength(0);
-      // expect(Array.isArray(bookings)).toBe(true);
+      const bookings = await listBookings.execute(tenantId);
+      expect(bookings).toHaveLength(0);
+      expect(Array.isArray(bookings)).toBe(true);
     });
 
     test('should list bookings by status', async () => {
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const afterTomorrow = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
       await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
         status: BookingStatus.PENDING,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(tomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(11, 0, 0, 0)),
       });
 
       await createBooking.execute({
@@ -153,8 +157,8 @@ describe.skip('Unit test ListBookings UseCase', () => {
         tenantId,
         customerId,
         status: BookingStatus.CONFIRMED,
-        requestedStart: new Date('2025-10-06T14:00:00'),
-        requestedEnd: new Date('2025-10-06T15:00:00'),
+        requestedStart: new Date(tomorrow.setHours(14, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(15, 0, 0, 0)),
       });
 
       await createBooking.execute({
@@ -162,8 +166,8 @@ describe.skip('Unit test ListBookings UseCase', () => {
         tenantId,
         customerId,
         status: BookingStatus.CANCELLED,
-        requestedStart: new Date('2025-10-07T10:00:00'),
-        requestedEnd: new Date('2025-10-07T11:00:00'),
+        requestedStart: new Date(afterTomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(afterTomorrow.setHours(11, 0, 0, 0)),
       });
 
       // const pendingBookings = await listBookings.execute(tenantId, { status: BookingStatus.PENDING });
@@ -180,28 +184,30 @@ describe.skip('Unit test ListBookings UseCase', () => {
         phone: '11977777777',
       });
 
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const afterTomorrow = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
       await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(tomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(11, 0, 0, 0)),
       });
 
       await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
-        requestedStart: new Date('2025-10-06T14:00:00'),
-        requestedEnd: new Date('2025-10-06T15:00:00'),
+        requestedStart: new Date(tomorrow.setHours(14, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(15, 0, 0, 0)),
       });
 
       await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId: customer2.id!,
-        requestedStart: new Date('2025-10-07T10:00:00'),
-        requestedEnd: new Date('2025-10-07T11:00:00'),
+        requestedStart: new Date(afterTomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(afterTomorrow.setHours(11, 0, 0, 0)),
       });
 
       // const customerBookings = await listBookings.execute(tenantId, { customerId });
@@ -218,13 +224,14 @@ describe.skip('Unit test ListBookings UseCase', () => {
         name: 'Barba',
       });
 
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
       await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
         serviceId,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(tomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(11, 0, 0, 0)),
       });
 
       await createBooking.execute({
@@ -232,8 +239,8 @@ describe.skip('Unit test ListBookings UseCase', () => {
         tenantId,
         customerId,
         serviceId: service2.id!,
-        requestedStart: new Date('2025-10-06T14:00:00'),
-        requestedEnd: new Date('2025-10-06T15:00:00'),
+        requestedStart: new Date(tomorrow.setHours(14, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(15, 0, 0, 0)),
       });
 
       // const serviceBookings = await listBookings.execute(tenantId, { serviceId });
@@ -243,13 +250,15 @@ describe.skip('Unit test ListBookings UseCase', () => {
     });
 
     test('should list bookings by staff user', async () => {
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const afterTomorrow = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
       await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
         staffUserId: 'staff-123',
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(tomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(11, 0, 0, 0)),
       });
 
       await createBooking.execute({
@@ -257,8 +266,8 @@ describe.skip('Unit test ListBookings UseCase', () => {
         tenantId,
         customerId,
         staffUserId: 'staff-123',
-        requestedStart: new Date('2025-10-06T14:00:00'),
-        requestedEnd: new Date('2025-10-06T15:00:00'),
+        requestedStart: new Date(tomorrow.setHours(14, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(15, 0, 0, 0)),
       });
 
       await createBooking.execute({
@@ -266,8 +275,8 @@ describe.skip('Unit test ListBookings UseCase', () => {
         tenantId,
         customerId,
         staffUserId: 'staff-456',
-        requestedStart: new Date('2025-10-07T10:00:00'),
-        requestedEnd: new Date('2025-10-07T11:00:00'),
+        requestedStart: new Date(afterTomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(afterTomorrow.setHours(11, 0, 0, 0)),
       });
 
       // const staffBookings = await listBookings.execute(tenantId, { staffUserId: 'staff-123' });
@@ -313,28 +322,30 @@ describe.skip('Unit test ListBookings UseCase', () => {
         phone: '11977777777',
       });
 
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const afterTomorrow = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
       await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(tomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(11, 0, 0, 0)),
       });
 
       await createBooking.execute({
         ...validBooking,
         tenantId: tenant2Id,
         customerId: customer2.id!,
-        requestedStart: new Date('2025-10-06T14:00:00'),
-        requestedEnd: new Date('2025-10-06T15:00:00'),
+        requestedStart: new Date(tomorrow.setHours(14, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(15, 0, 0, 0)),
       });
 
       await createBooking.execute({
         ...validBooking,
         tenantId: tenant2Id,
         customerId: customer2.id!,
-        requestedStart: new Date('2025-10-07T10:00:00'),
-        requestedEnd: new Date('2025-10-07T11:00:00'),
+        requestedStart: new Date(afterTomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(afterTomorrow.setHours(11, 0, 0, 0)),
       });
 
       // const tenant1Bookings = await listBookings.execute(tenantId);
@@ -347,28 +358,31 @@ describe.skip('Unit test ListBookings UseCase', () => {
 
   describe('Sorting and Ordering', () => {
     test('should list bookings ordered by date', async () => {
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const afterTomorrow = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+      const threeDays = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
       await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
-        requestedStart: new Date('2025-10-08T10:00:00'),
-        requestedEnd: new Date('2025-10-08T11:00:00'),
+        requestedStart: new Date(threeDays.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(threeDays.setHours(11, 0, 0, 0)),
       });
 
       await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(tomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(11, 0, 0, 0)),
       });
 
       await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
-        requestedStart: new Date('2025-10-07T10:00:00'),
-        requestedEnd: new Date('2025-10-07T11:00:00'),
+        requestedStart: new Date(afterTomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(afterTomorrow.setHours(11, 0, 0, 0)),
       });
 
       // const bookings = await listBookings.execute(tenantId, { sortBy: 'date' });
@@ -379,49 +393,55 @@ describe.skip('Unit test ListBookings UseCase', () => {
     });
 
     test('should filter bookings by date range', async () => {
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const afterTomorrow = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+      const threeDays = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+      const fourDays = new Date(Date.now() + 4 * 24 * 60 * 60 * 1000);
+
       await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
-        requestedStart: new Date('2025-10-05T10:00:00'),
-        requestedEnd: new Date('2025-10-05T11:00:00'),
+        requestedStart: new Date(tomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(11, 0, 0, 0)),
       });
 
       await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(afterTomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(afterTomorrow.setHours(11, 0, 0, 0)),
       });
 
       await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
-        requestedStart: new Date('2025-10-07T10:00:00'),
-        requestedEnd: new Date('2025-10-07T11:00:00'),
+        requestedStart: new Date(threeDays.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(threeDays.setHours(11, 0, 0, 0)),
       });
 
       await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
-        requestedStart: new Date('2025-10-08T10:00:00'),
-        requestedEnd: new Date('2025-10-08T11:00:00'),
+        requestedStart: new Date(fourDays.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(fourDays.setHours(11, 0, 0, 0)),
       });
 
-      // const bookings = await listBookings.execute(tenantId, {
-      //   startDate: new Date('2025-10-06T00:00:00'),
-      //   endDate: new Date('2025-10-07T23:59:59'),
-      // });
+      const bookings = await listBookings.execute(tenantId, {
+        startDate: new Date(afterTomorrow.setHours(0, 0, 0, 0)),
+        endDate: new Date(threeDays.setHours(23, 59, 59, 999)),
+      });
 
-      // expect(bookings).toHaveLength(2);
+      expect(bookings).toHaveLength(2);
     });
   });
 
   describe('Edge Cases', () => {
     test('should preserve all booking properties', async () => {
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
       await createBooking.execute({
         ...validBooking,
         tenantId,
@@ -429,8 +449,8 @@ describe.skip('Unit test ListBookings UseCase', () => {
         serviceId,
         staffUserId: 'staff-123',
         status: BookingStatus.CONFIRMED,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(tomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(11, 0, 0, 0)),
         notes: 'Teste',
       });
 
@@ -447,12 +467,13 @@ describe.skip('Unit test ListBookings UseCase', () => {
 
     test('should handle large number of bookings', async () => {
       for (let i = 0; i < 20; i++) {
+        const futureDay = new Date(Date.now() + (1 + i) * 24 * 60 * 60 * 1000);
         await createBooking.execute({
           ...validBooking,
           tenantId,
           customerId,
-          requestedStart: new Date(`2025-10-${String(6 + i).padStart(2, '0')}T10:00:00`),
-          requestedEnd: new Date(`2025-10-${String(6 + i).padStart(2, '0')}T11:00:00`),
+          requestedStart: new Date(futureDay.setHours(10, 0, 0, 0)),
+          requestedEnd: new Date(futureDay.setHours(11, 0, 0, 0)),
         });
       }
 
