@@ -8,9 +8,9 @@ import { CreateTenant } from '../../../core/useCases/tenant/Create';
 import { CreateCustomer } from '../../../core/useCases/customer/Create';
 import { CreateService } from '../../../core/useCases/service/Create';
 import { BookingStatus } from '../../../core/interfaces/Booking';
-// import { UpdateBooking } from '../../../core/useCases/booking/Update'; // TODO: Implementar
-
-describe.skip('Unit test UpdateBooking UseCase', () => {
+import { BookingEntity } from '../../../core/entities/BookingEntity';
+import UpdateBooking from './../../../core/useCases/booking/Update';
+describe('Unit test UpdateBooking UseCase', () => {
   let bookingRepository: BookingRepositoryInMemory;
   let tenantRepository: TenantRepositoryInMemory;
   let customerRepository: CustomerRepositoryInMemory;
@@ -19,7 +19,7 @@ describe.skip('Unit test UpdateBooking UseCase', () => {
   let createTenant: CreateTenant;
   let createCustomer: CreateCustomer;
   let createService: CreateService;
-  // let updateBooking: UpdateBooking; // TODO: Implementar
+  let updateBooking: UpdateBooking;
   let tenantId: string;
   let customerId: string;
   let serviceId: string;
@@ -52,8 +52,8 @@ describe.skip('Unit test UpdateBooking UseCase', () => {
 
   const validBooking = {
     status: BookingStatus.PENDING,
-    requestedStart: new Date('2025-10-06T10:00:00'),
-    requestedEnd: new Date('2025-10-06T10:30:00'),
+    requestedStart: new Date('2025-10-20T10:00:00'),
+    requestedEnd: new Date('2025-10-21T10:30:00'),
   };
 
   beforeEach(async () => {
@@ -67,7 +67,7 @@ describe.skip('Unit test UpdateBooking UseCase', () => {
       customerRepository,
       serviceRepository
     );
-    // updateBooking = new UpdateBooking(bookingRepository, tenantRepository, customerRepository, serviceRepository); // TODO: Implementar
+    updateBooking = new UpdateBooking(bookingRepository);
     createTenant = new CreateTenant(tenantRepository);
     createCustomer = new CreateCustomer(customerRepository, tenantRepository);
     createService = new CreateService(serviceRepository, tenantRepository);
@@ -97,18 +97,25 @@ describe.skip('Unit test UpdateBooking UseCase', () => {
         serviceId,
       });
 
-      // const updated = await updateBooking.execute({
-      //   id: booking.id!,
-      //   tenantId,
-      //   customerId: booking.customerId,
-      //   serviceId: booking.serviceId,
-      //   status: BookingStatus.CONFIRMED,
-      //   requestedStart: booking.requestedStart,
-      //   requestedEnd: booking.requestedEnd,
-      // });
+      // Cria uma nova instância da entidade com status atualizado e updatedAt > createdAt
+      const updatedBooking = BookingEntity.create({
+        id: booking.id!,
+        tenantId: booking.tenantId,
+        customerId: booking.customerId,
+        serviceId: booking.serviceId,
+        staffUserId: booking.staffUserId,
+        status: BookingStatus.CONFIRMED,
+        requestedStart: booking.requestedStart,
+        requestedEnd: booking.requestedEnd,
+        notes: booking.notes,
+        rating: booking.rating,
+        createdAt: booking.createdAt,
+        updatedAt: new Date(booking.createdAt.getTime() + 1000),
+      });
+      const updated = await updateBooking.execute(updatedBooking);
 
-      // expect(updated.status).toBe(BookingStatus.CONFIRMED);
-      // expect(updated.updatedAt.getTime()).toBeGreaterThan(booking.createdAt.getTime());
+      expect(updated.status).toBe(BookingStatus.CONFIRMED);
+      expect(updated.updatedAt.getTime()).toBeGreaterThan(booking.createdAt.getTime());
     });
 
     test('should update booking time', async () => {
@@ -226,14 +233,26 @@ describe.skip('Unit test UpdateBooking UseCase', () => {
 
   describe('Time Conflict Validation', () => {
     test('should throw error when updating to conflicting time', async () => {
+      // Datas dinâmicas futuras para evitar erro de "Data de início no passado"
+      const now = Date.now();
+      const start1 = new Date(now + 24 * 60 * 60 * 1000); // amanhã 10:00
+      start1.setHours(10, 0, 0, 0);
+      const end1 = new Date(start1);
+      end1.setHours(11, 0, 0, 0);
+
+      const start2 = new Date(now + 24 * 60 * 60 * 1000); // amanhã 14:00
+      start2.setHours(14, 0, 0, 0);
+      const end2 = new Date(start2);
+      end2.setHours(15, 0, 0, 0);
+
       const booking1 = await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
         serviceId,
         staffUserId: 'staff-123',
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: start1,
+        requestedEnd: end1,
       });
 
       await createBooking.execute({
@@ -242,22 +261,33 @@ describe.skip('Unit test UpdateBooking UseCase', () => {
         customerId,
         serviceId,
         staffUserId: 'staff-123',
-        requestedStart: new Date('2025-10-06T14:00:00'),
-        requestedEnd: new Date('2025-10-06T15:00:00'),
+        requestedStart: start2,
+        requestedEnd: end2,
       });
 
-      // await expect(() =>
-      //   updateBooking.execute({
-      //     id: booking1.id!,
-      //     tenantId,
-      //     customerId,
-      //     serviceId,
-      //     staffUserId: 'staff-123',
-      //     status: booking1.status,
-      //     requestedStart: new Date('2025-10-06T14:30:00'),
-      //     requestedEnd: new Date('2025-10-06T15:30:00'),
-      //   })
-      // ).rejects.toThrow('Já existe um agendamento neste horário');
+      // Tenta atualizar para horário conflitante
+      const conflictStart = new Date(start2);
+      conflictStart.setMinutes(30); // 14:30
+      const conflictEnd = new Date(conflictStart);
+      conflictEnd.setHours(15, 30, 0, 0); // 15:30
+
+      const updatedBooking = BookingEntity.create({
+        id: booking1.id!,
+        tenantId,
+        customerId,
+        serviceId,
+        staffUserId: 'staff-123',
+        status: booking1.status,
+        requestedStart: conflictStart,
+        requestedEnd: conflictEnd,
+        notes: booking1.notes,
+        rating: booking1.rating,
+        createdAt: booking1.createdAt,
+        updatedAt: new Date(),
+      });
+      await expect(updateBooking.execute(updatedBooking)).rejects.toThrow(
+        'Já existe um agendamento neste horário'
+      );
     });
 
     test('should allow update with same time (no conflict with itself)', async () => {

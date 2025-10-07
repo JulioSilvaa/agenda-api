@@ -3,14 +3,14 @@ import { AvailabilityRepositoryInMemory } from '../../../infra/repositories/repo
 import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantyRepositoryInMemory';
 import { CreateAvailability } from '../../../core/useCases/availability/Create';
 import { CreateTenant } from '../../../core/useCases/tenant/Create';
-// import { ListAvailabilities } from '../../../core/useCases/availability/List'; // TODO: Implementar
+import { ListAvailabilities } from './../../../core/useCases/availability/List';
 
-describe.skip('Unit test ListAvailabilities UseCase', () => {
+describe('Unit test ListAvailabilities UseCase', () => {
   let availabilityRepository: AvailabilityRepositoryInMemory;
   let tenantRepository: TenantRepositoryInMemory;
   let createAvailability: CreateAvailability;
   let createTenant: CreateTenant;
-  // let listAvailabilities: ListAvailabilities; // TODO: Implementar
+  let listAvailabilities: ListAvailabilities;
   let tenantId: string;
   let tenant2Id: string;
 
@@ -20,6 +20,7 @@ describe.skip('Unit test ListAvailabilities UseCase', () => {
     slug: 'salao-beleza',
     phone: '11999999999',
     isActive: true,
+    password: 'Senha123#',
     address: 'Rua Teste, 123',
   };
 
@@ -81,7 +82,6 @@ describe.skip('Unit test ListAvailabilities UseCase', () => {
 
     test('should return empty array when tenant has no availabilities', async () => {
       // const availabilities = await listAvailabilities.execute(tenantId);
-
       // expect(availabilities).toHaveLength(0);
       // expect(Array.isArray(availabilities)).toBe(true);
     });

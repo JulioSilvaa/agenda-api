@@ -8,9 +8,9 @@ import { CreateTenant } from '../../../core/useCases/tenant/Create';
 import { CreateCustomer } from '../../../core/useCases/customer/Create';
 import { CreateService } from '../../../core/useCases/service/Create';
 import { BookingStatus } from '../../../core/interfaces/Booking';
-// import { DeleteBooking } from '../../../core/useCases/booking/Delete'; // TODO: Implementar
+import DeleteBooking from '../../../core/useCases/booking/Delete';
 
-describe.skip('Unit test DeleteBooking UseCase', () => {
+describe('Unit test DeleteBooking UseCase', () => {
   let bookingRepository: BookingRepositoryInMemory;
   let tenantRepository: TenantRepositoryInMemory;
   let customerRepository: CustomerRepositoryInMemory;
@@ -19,7 +19,7 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
   let createTenant: CreateTenant;
   let createCustomer: CreateCustomer;
   let createService: CreateService;
-  // let deleteBooking: DeleteBooking; // TODO: Implementar
+  let deleteBooking: DeleteBooking;
   let tenantId: string;
   let tenant2Id: string;
   let customerId: string;
@@ -40,6 +40,7 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
     email: 'joao@example.com',
     phone: '11988888888',
     isActive: true,
+    // password: "Senha#123",
     totalBookings: 0,
   };
 
@@ -53,8 +54,8 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
 
   const validBooking = {
     status: BookingStatus.PENDING,
-    requestedStart: new Date('2025-10-06T10:00:00'),
-    requestedEnd: new Date('2025-10-06T10:30:00'),
+    requestedStart: new Date(Date.now() + 24 * 60 * 60 * 1000), // amanhã 10:00
+    requestedEnd: new Date(Date.now() + 24 * 60 * 60 * 1000 + 30 * 60 * 1000), // amanhã 10:30
   };
 
   beforeEach(async () => {
@@ -68,7 +69,7 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
       customerRepository,
       serviceRepository
     );
-    // deleteBooking = new DeleteBooking(bookingRepository); // TODO: Implementar
+    deleteBooking = new DeleteBooking(bookingRepository);
     createTenant = new CreateTenant(tenantRepository);
     createCustomer = new CreateCustomer(customerRepository, tenantRepository);
     createService = new CreateService(serviceRepository, tenantRepository);
@@ -80,7 +81,7 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
       ...validTenant,
       email: 'salao2@example.com',
       slug: 'salao-2',
-      password: '',
+      password: 'Senha#123A',
     });
     tenant2Id = tenant2.id!;
 
@@ -107,20 +108,22 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
         serviceId,
       });
 
-      // await deleteBooking.execute(booking.id!, tenantId);
+      await deleteBooking.execute(booking.id!, tenantId);
 
-      // const foundBooking = await bookingRepository.findById(booking.id!);
-      // expect(foundBooking).toBeNull();
+      const foundBooking = await bookingRepository.findById(booking.id!);
+      expect(foundBooking).toBeNull();
     });
 
     test('should remove booking from repository', async () => {
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const afterTomorrow = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
       const booking1 = await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
         serviceId,
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(tomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(11, 0, 0, 0)),
       });
 
       const booking2 = await createBooking.execute({
@@ -128,15 +131,15 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
         tenantId,
         customerId,
         serviceId,
-        requestedStart: new Date('2025-10-06T14:00:00'),
-        requestedEnd: new Date('2025-10-06T15:00:00'),
+        requestedStart: new Date(tomorrow.setHours(14, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(15, 0, 0, 0)),
       });
 
-      // await deleteBooking.execute(booking1.id!, tenantId);
+      await deleteBooking.execute(booking1.id!, tenantId);
 
-      // const allBookings = await bookingRepository.findByTenantId(tenantId);
-      // expect(allBookings.length).toBe(1);
-      // expect(allBookings[0].id).toBe(booking2.id);
+      const allBookings = await bookingRepository.findByTenantId(tenantId);
+      expect(allBookings.length).toBe(1);
+      expect(allBookings[0].id).toBe(booking2.id);
     });
 
     test('should delete bookings with different statuses', async () => {
@@ -147,24 +150,24 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
         status: BookingStatus.PENDING,
       });
 
-      // await deleteBooking.execute(pendingBooking.id!, tenantId);
+      await deleteBooking.execute(pendingBooking.id!, tenantId);
 
-      // const found = await bookingRepository.findById(pendingBooking.id!);
-      // expect(found).toBeNull();
+      const found = await bookingRepository.findById(pendingBooking.id!);
+      expect(found).toBeNull();
     });
   });
 
   describe('Not Found Errors', () => {
     test('should throw error when booking does not exist', async () => {
-      // await expect(() =>
-      //   deleteBooking.execute('non-existent-id', tenantId)
-      // ).rejects.toThrow('Agendamento não encontrado');
+      await expect(() => deleteBooking.execute('non-existent-id', tenantId)).rejects.toThrow(
+        'Agendamento não encontrado'
+      );
     });
 
     test('should throw error for empty id', async () => {
-      // await expect(() => deleteBooking.execute('', tenantId)).rejects.toThrow(
-      //   'Agendamento não encontrado'
-      // );
+      await expect(() => deleteBooking.execute('', tenantId)).rejects.toThrow(
+        'Agendamento não encontrado'
+      );
     });
   });
 
@@ -177,9 +180,9 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
         serviceId,
       });
 
-      // await expect(() =>
-      //   deleteBooking.execute(booking.id!, tenant2Id)
-      // ).rejects.toThrow('Agendamento não pertence a este tenant');
+      await expect(() => deleteBooking.execute(booking.id!, tenant2Id)).rejects.toThrow(
+        'Agendamento não pertence a este tenant'
+      );
     });
 
     test('should throw error for invalid tenant id', async () => {
@@ -190,9 +193,9 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
         serviceId,
       });
 
-      // await expect(() =>
-      //   deleteBooking.execute(booking.id!, 'wrong-tenant')
-      // ).rejects.toThrow('Agendamento não pertence a este tenant');
+      await expect(() => deleteBooking.execute(booking.id!, 'wrong-tenant')).rejects.toThrow(
+        'Agendamento não pertence a este tenant'
+      );
     });
   });
 
@@ -217,13 +220,13 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
         customerId: customer2.id!,
       });
 
-      // await deleteBooking.execute(booking1.id!, tenantId);
+      await deleteBooking.execute(booking1.id!, tenantId);
 
-      // const found1 = await bookingRepository.findById(booking1.id!);
-      // const found2 = await bookingRepository.findById(booking2.id!);
+      const found1 = await bookingRepository.findById(booking1.id!);
+      const found2 = await bookingRepository.findById(booking2.id!);
 
-      // expect(found1).toBeNull();
-      // expect(found2).toBeDefined();
+      expect(found1).toBeNull();
+      expect(found2).toBeDefined();
     });
 
     test('should handle deletion of already deleted booking', async () => {
@@ -233,11 +236,11 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
         customerId,
       });
 
-      // await deleteBooking.execute(booking.id!, tenantId);
+      await deleteBooking.execute(booking.id!, tenantId);
 
-      // await expect(() =>
-      //   deleteBooking.execute(booking.id!, tenantId)
-      // ).rejects.toThrow('Agendamento não encontrado');
+      await expect(() => deleteBooking.execute(booking.id!, tenantId)).rejects.toThrow(
+        'Agendamento não encontrado'
+      );
     });
 
     test('should delete cancelled booking', async () => {
@@ -248,10 +251,10 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
         status: BookingStatus.CANCELLED,
       });
 
-      // await deleteBooking.execute(booking.id!, tenantId);
+      await deleteBooking.execute(booking.id!, tenantId);
 
-      // const foundBooking = await bookingRepository.findById(booking.id!);
-      // expect(foundBooking).toBeNull();
+      const foundBooking = await bookingRepository.findById(booking.id!);
+      expect(foundBooking).toBeNull();
     });
 
     test('should delete completed booking', async () => {
@@ -262,37 +265,38 @@ describe.skip('Unit test DeleteBooking UseCase', () => {
         status: BookingStatus.COMPLETED,
       });
 
-      // await deleteBooking.execute(booking.id!, tenantId);
+      await deleteBooking.execute(booking.id!, tenantId);
 
-      // const foundBooking = await bookingRepository.findById(booking.id!);
-      // expect(foundBooking).toBeNull();
+      const foundBooking = await bookingRepository.findById(booking.id!);
+      expect(foundBooking).toBeNull();
     });
 
     test('should allow creating booking in same slot after deletion', async () => {
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
       const booking = await createBooking.execute({
         ...validBooking,
         tenantId,
         customerId,
         serviceId,
         staffUserId: 'staff-123',
-        requestedStart: new Date('2025-10-06T10:00:00'),
-        requestedEnd: new Date('2025-10-06T11:00:00'),
+        requestedStart: new Date(tomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(11, 0, 0, 0)),
       });
 
-      // await deleteBooking.execute(booking.id!, tenantId);
+      await deleteBooking.execute(booking.id!, tenantId);
 
-      // const newBooking = await createBooking.execute({
-      //   ...validBooking,
-      //   tenantId,
-      //   customerId,
-      //   serviceId,
-      //   staffUserId: 'staff-123',
-      //   requestedStart: new Date('2025-10-06T10:00:00'),
-      //   requestedEnd: new Date('2025-10-06T11:00:00'),
-      // });
+      const newBooking = await createBooking.execute({
+        ...validBooking,
+        tenantId,
+        customerId,
+        serviceId,
+        staffUserId: 'staff-123',
+        requestedStart: new Date(tomorrow.setHours(10, 0, 0, 0)),
+        requestedEnd: new Date(tomorrow.setHours(11, 0, 0, 0)),
+      });
 
-      // expect(newBooking).toBeDefined();
-      // expect(newBooking.id).not.toBe(booking.id);
+      expect(newBooking).toBeDefined();
+      expect(newBooking.id).not.toBe(booking.id);
     });
   });
 });

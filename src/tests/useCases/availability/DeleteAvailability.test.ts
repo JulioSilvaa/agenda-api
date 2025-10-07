@@ -3,14 +3,14 @@ import { AvailabilityRepositoryInMemory } from '../../../infra/repositories/repo
 import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantyRepositoryInMemory';
 import { CreateAvailability } from '../../../core/useCases/availability/Create';
 import { CreateTenant } from '../../../core/useCases/tenant/Create';
-// import { DeleteAvailability } from '../../../core/useCases/availability/Delete'; // TODO: Implementar
+import DeleteAvailability from '../../../core/useCases/availability/Delete';
 
-describe.skip('Unit test DeleteAvailability UseCase', () => {
+describe('Unit test DeleteAvailability UseCase', () => {
   let availabilityRepository: AvailabilityRepositoryInMemory;
   let tenantRepository: TenantRepositoryInMemory;
   let createAvailability: CreateAvailability;
   let createTenant: CreateTenant;
-  // let deleteAvailability: DeleteAvailability; // TODO: Implementar
+  let deleteAvailability: DeleteAvailability;
   let tenantId: string;
   let tenant2Id: string;
 
@@ -19,6 +19,7 @@ describe.skip('Unit test DeleteAvailability UseCase', () => {
     email: 'salao@example.com',
     slug: 'salao-beleza',
     phone: '11999999999',
+    password: 'Senha123#',
     isActive: true,
     address: 'Rua Teste, 123',
   };
@@ -34,7 +35,7 @@ describe.skip('Unit test DeleteAvailability UseCase', () => {
     availabilityRepository = new AvailabilityRepositoryInMemory();
     tenantRepository = new TenantRepositoryInMemory();
     createAvailability = new CreateAvailability(availabilityRepository, tenantRepository);
-    // deleteAvailability = new DeleteAvailability(availabilityRepository); // TODO: Implementar
+    deleteAvailability = new DeleteAvailability(availabilityRepository);
     createTenant = new CreateTenant(tenantRepository);
 
     const tenant = await createTenant.execute(validTenant);
@@ -55,10 +56,10 @@ describe.skip('Unit test DeleteAvailability UseCase', () => {
         tenantId,
       });
 
-      // await deleteAvailability.execute(availability.id!, tenantId);
+      await deleteAvailability.execute(availability.id!, tenantId);
 
-      // const foundAvailability = await availabilityRepository.findById(availability.id!);
-      // expect(foundAvailability).toBeNull();
+      const foundAvailability = await availabilityRepository.findById(availability.id!);
+      expect(foundAvailability).toBeNull();
     });
 
     test('should remove availability from repository', async () => {
@@ -74,11 +75,11 @@ describe.skip('Unit test DeleteAvailability UseCase', () => {
         weekday: 2,
       });
 
-      // await deleteAvailability.execute(availability1.id!, tenantId);
+      await deleteAvailability.execute(availability1.id!, tenantId);
 
-      // const allAvailabilities = await availabilityRepository.findByTenantId(tenantId);
-      // expect(allAvailabilities.length).toBe(1);
-      // expect(allAvailabilities[0].id).toBe(availability2.id);
+      const allAvailabilities = await availabilityRepository.findByTenantId(tenantId);
+      expect(allAvailabilities.length).toBe(1);
+      expect(allAvailabilities[0].id).toBe(availability2.id);
     });
 
     test('should delete multiple availabilities independently', async () => {
@@ -94,27 +95,27 @@ describe.skip('Unit test DeleteAvailability UseCase', () => {
         weekday: 2,
       });
 
-      // await deleteAvailability.execute(availability1.id!, tenantId);
+      await deleteAvailability.execute(availability1.id!, tenantId);
 
-      // const found1 = await availabilityRepository.findById(availability1.id!);
-      // const found2 = await availabilityRepository.findById(availability2.id!);
+      const found1 = await availabilityRepository.findById(availability1.id!);
+      const found2 = await availabilityRepository.findById(availability2.id!);
 
-      // expect(found1).toBeNull();
-      // expect(found2).toBeDefined();
+      expect(found1).toBeNull();
+      expect(found2).toBeDefined();
     });
   });
 
   describe('Not Found Errors', () => {
     test('should throw error when availability does not exist', async () => {
-      // await expect(() =>
-      //   deleteAvailability.execute('non-existent-id', tenantId)
-      // ).rejects.toThrow('Disponibilidade não encontrada');
+      await expect(() => deleteAvailability.execute('non-existent-id', tenantId)).rejects.toThrow(
+        'Disponibilidade não encontrada'
+      );
     });
 
     test('should throw error for empty id', async () => {
-      // await expect(() => deleteAvailability.execute('', tenantId)).rejects.toThrow(
-      //   'Disponibilidade não encontrada'
-      // );
+      await expect(() => deleteAvailability.execute('', tenantId)).rejects.toThrow(
+        'Disponibilidade não encontrada'
+      );
     });
   });
 
@@ -125,9 +126,9 @@ describe.skip('Unit test DeleteAvailability UseCase', () => {
         tenantId,
       });
 
-      // await expect(() =>
-      //   deleteAvailability.execute(availability.id!, tenant2Id)
-      // ).rejects.toThrow('Disponibilidade não pertence a este tenant');
+      await expect(() => deleteAvailability.execute(availability.id!, tenant2Id)).rejects.toThrow(
+        'Disponibilidade não pertence a este tenant'
+      );
     });
 
     test('should throw error for invalid tenant id', async () => {
@@ -136,9 +137,9 @@ describe.skip('Unit test DeleteAvailability UseCase', () => {
         tenantId,
       });
 
-      // await expect(() =>
-      //   deleteAvailability.execute(availability.id!, 'wrong-tenant')
-      // ).rejects.toThrow('Disponibilidade não pertence a este tenant');
+      await expect(() =>
+        deleteAvailability.execute(availability.id!, 'wrong-tenant')
+      ).rejects.toThrow('Disponibilidade não pertence a este tenant');
     });
   });
 
@@ -154,13 +155,13 @@ describe.skip('Unit test DeleteAvailability UseCase', () => {
         tenantId: tenant2Id,
       });
 
-      // await deleteAvailability.execute(availability1.id!, tenantId);
+      await deleteAvailability.execute(availability1.id!, tenantId);
 
-      // const found1 = await availabilityRepository.findById(availability1.id!);
-      // const found2 = await availabilityRepository.findById(availability2.id!);
+      const found1 = await availabilityRepository.findById(availability1.id!);
+      const found2 = await availabilityRepository.findById(availability2.id!);
 
-      // expect(found1).toBeNull();
-      // expect(found2).toBeDefined();
+      expect(found1).toBeNull();
+      expect(found2).toBeDefined();
     });
 
     test('should handle deletion of already deleted availability', async () => {
@@ -169,11 +170,11 @@ describe.skip('Unit test DeleteAvailability UseCase', () => {
         tenantId,
       });
 
-      // await deleteAvailability.execute(availability.id!, tenantId);
+      await deleteAvailability.execute(availability.id!, tenantId);
 
-      // await expect(() =>
-      //   deleteAvailability.execute(availability.id!, tenantId)
-      // ).rejects.toThrow('Disponibilidade não encontrada');
+      await expect(() => deleteAvailability.execute(availability.id!, tenantId)).rejects.toThrow(
+        'Disponibilidade não encontrada'
+      );
     });
 
     test('should delete inactive availability', async () => {
@@ -183,10 +184,10 @@ describe.skip('Unit test DeleteAvailability UseCase', () => {
         isActive: false,
       });
 
-      // await deleteAvailability.execute(availability.id!, tenantId);
+      await deleteAvailability.execute(availability.id!, tenantId);
 
-      // const foundAvailability = await availabilityRepository.findById(availability.id!);
-      // expect(foundAvailability).toBeNull();
+      const foundAvailability = await availabilityRepository.findById(availability.id!);
+      expect(foundAvailability).toBeNull();
     });
 
     test('should allow creating availability in same time slot after deletion', async () => {
@@ -198,18 +199,18 @@ describe.skip('Unit test DeleteAvailability UseCase', () => {
         endTime: '12:00',
       });
 
-      // await deleteAvailability.execute(availability.id!, tenantId);
+      await deleteAvailability.execute(availability.id!, tenantId);
 
-      // const newAvailability = await createAvailability.execute({
-      //   ...validAvailability,
-      //   tenantId,
-      //   weekday: 1,
-      //   startTime: '09:00',
-      //   endTime: '12:00',
-      // });
+      const newAvailability = await createAvailability.execute({
+        ...validAvailability,
+        tenantId,
+        weekday: 1,
+        startTime: '09:00',
+        endTime: '12:00',
+      });
 
-      // expect(newAvailability).toBeDefined();
-      // expect(newAvailability.id).not.toBe(availability.id);
+      expect(newAvailability).toBeDefined();
+      expect(newAvailability.id).not.toBe(availability.id);
     });
   });
 });
