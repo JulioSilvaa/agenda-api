@@ -1,8 +1,8 @@
 import { describe, expect, test, beforeEach } from 'vitest';
 import bcrypt from 'bcrypt';
-import { UserRepositoryInMemory } from '../../infra/repositories/repositoryInMemory/UserRepositoryInMemory';
-import { UserEntity } from '../../core/entities/UserEntity';
-import { UserRole } from '../../core/interfaces/User';
+import { UserRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/UserRepositoryInMemory';
+import { UserEntity } from '../../../core/entities/UserEntity';
+import { UserRole } from '../../../core/interfaces/User';
 
 describe('Unit test UserRepositoryInMemory', () => {
   let repository: UserRepositoryInMemory;

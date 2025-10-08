@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "test": "vitest",
     "test:ui": "vitest --ui",
@@ -15,7 +15,9 @@
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write \"src/**/*.{ts,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,json}\"",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:seed:customers": "tsx scripts/seedCustomers.ts",
+    "db:customers": "tsx scripts/listCustomers.ts"
   },
   "lint-staged": {
     "*.ts": [
@@ -28,7 +30,9 @@
     ]
   },
   "dependencies": {
-    "bcrypt": "^6.0.0"
+    "bcrypt": "^6.0.0",
+    "sqlite3": "^5.1.7",
+    "sqlite": "^5.1.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
@@ -47,7 +51,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.3",
     "prettier": "^3.6.2",
-    "tsc": "^2.0.4",
+    "tsx": "^4.19.1",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   }

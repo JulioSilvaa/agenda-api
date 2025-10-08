@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach } from 'vitest';
-import { CustomerRepositoryInMemory } from '../../infra/repositories/repositoryInMemory/CustomerRepositoryInMemory';
-import { CustomerEntity } from '../../core/entities/CustomerEntity';
+import { CustomerRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/CustomerRepositoryInMemory';
+import { CustomerEntity } from '../../../core/entities/CustomerEntity';
 
 describe('Unit test CustomerRepositoryInMemory', () => {
   let repository: CustomerRepositoryInMemory;

@@ -1,4 +1,4 @@
-import { IUser, UserRole } from "../interfaces/User";
+import { IUser, UserRole } from '../interfaces/User';
 
 export class UserEntity {
   private readonly _id?: string;
@@ -40,56 +40,54 @@ export class UserEntity {
 
   private validateName(): void {
     if (!this._name || this._name.trim().length === 0) {
-      throw new Error("Nome é obrigatório");
+      throw new Error('Nome é obrigatório');
     }
 
     if (this._name.trim().length < 3) {
-      throw new Error("Nome deve ter pelo menos 3 caracteres");
+      throw new Error('Nome deve ter pelo menos 3 caracteres');
     }
 
     if (this._name.length > 100) {
-      throw new Error("Nome não pode ter mais de 100 caracteres");
+      throw new Error('Nome não pode ter mais de 100 caracteres');
     }
   }
 
   private validateEmail(): void {
     if (!this._email || this._email.trim().length === 0) {
-      throw new Error("Email é obrigatório");
+      throw new Error('Email é obrigatório');
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this._email)) {
-      throw new Error("Email inválido");
+      throw new Error('Email inválido');
     }
   }
 
   private validatePassword(): void {
     if (!this._password || this._password.trim().length === 0) {
-      throw new Error("Senha é obrigatória");
+      throw new Error('Senha é obrigatória');
     }
 
     if (this._password.length < 60) {
-      throw new Error("Senha deve estar hasheada");
+      throw new Error('Senha deve estar hasheada');
     }
   }
 
   private validateTenantId(): void {
     if (!this._tenantId || this._tenantId.trim().length === 0) {
-      throw new Error("TenantId é obrigatório");
+      throw new Error('TenantId é obrigatório');
     }
   }
 
   private validateRole(): void {
     if (!Object.values(UserRole).includes(this._role)) {
-      throw new Error("Role inválida");
+      throw new Error('Role inválida');
     }
   }
 
   private validateDates(): void {
     if (this._updatedAt < this._createdAt) {
-      throw new Error(
-        "Data de atualização não pode ser anterior à data de criação"
-      );
+      throw new Error('Data de atualização não pode ser anterior à data de criação');
     }
   }
 

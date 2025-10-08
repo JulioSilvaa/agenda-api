@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach } from 'vitest';
-import { AvailabilityRepositoryInMemory } from '../../infra/repositories/repositoryInMemory/AvailabilityRepositoryInMemory';
-import { AvailabilityEntity } from '../../core/entities/AvailabilityEntity';
+import { AvailabilityRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/AvailabilityRepositoryInMemory';
+import { AvailabilityEntity } from '../../../core/entities/AvailabilityEntity';
 
 describe('Unit test AvailabilityRepositoryInMemory', () => {
   let repository: AvailabilityRepositoryInMemory;
@@ -81,7 +81,7 @@ describe('Unit test AvailabilityRepositoryInMemory', () => {
       await repository.create(availability);
 
       const updated = AvailabilityEntity.create({
-        id: availability.id,
+        id: availability.id!,
         tenantId: availability.tenantId,
         weekday: availability.weekday,
         startTime: '10:00',

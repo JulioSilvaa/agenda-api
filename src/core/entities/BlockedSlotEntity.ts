@@ -1,4 +1,4 @@
-import { IBlockedSlot } from "../interfaces/BlockedSlot";
+import { IBlockedSlot } from '../interfaces/BlockedSlot';
 
 export class BlockedSlotEntity {
   private readonly _id?: string;
@@ -36,15 +36,13 @@ export class BlockedSlotEntity {
 
   private validateTenantId(): void {
     if (!this._tenantId || this._tenantId.trim().length === 0) {
-      throw new Error("TenantId é obrigatório");
+      throw new Error('TenantId é obrigatório');
     }
   }
 
   private validateTimeRange(): void {
     if (this._endTime <= this._startTime) {
-      throw new Error(
-        "Horário de término deve ser posterior ao horário de início"
-      );
+      throw new Error('Horário de término deve ser posterior ao horário de início');
     }
   }
 
@@ -52,15 +50,13 @@ export class BlockedSlotEntity {
     if (!this._reason) return;
 
     if (this._reason.length > 500) {
-      throw new Error("Motivo não pode ter mais de 500 caracteres");
+      throw new Error('Motivo não pode ter mais de 500 caracteres');
     }
   }
 
   private validateDates(): void {
     if (this._updatedAt < this._createdAt) {
-      throw new Error(
-        "Data de atualização não pode ser anterior à data de criação"
-      );
+      throw new Error('Data de atualização não pode ser anterior à data de criação');
     }
   }
 

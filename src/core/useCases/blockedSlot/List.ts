@@ -1,5 +1,5 @@
-import { BlockedSlotEntity } from "../../entities/BlockedSlotEntity";
-import { IBlockedSlotRepository } from "../../repositories/BlockedSlotRepository";
+import { BlockedSlotEntity } from '../../entities/BlockedSlotEntity';
+import { IBlockedSlotRepository } from '../../repositories/BlockedSlotRepository';
 
 export interface FindBlockedSlotsFilters {
   tenantId: string;
@@ -15,11 +15,9 @@ export class FindBlockedSlots {
     this.blockedSlotRepository = blockedSlotRepository;
   }
 
-  async execute(
-    filters: FindBlockedSlotsFilters
-  ): Promise<BlockedSlotEntity[]> {
+  async execute(filters: FindBlockedSlotsFilters): Promise<BlockedSlotEntity[]> {
     const allSlots = await this.blockedSlotRepository.findAll();
-    const filtered = allSlots.filter((slot) => {
+    const filtered = allSlots.filter(slot => {
       if (slot.tenantId !== filters.tenantId) return false;
       // staffUserId: só filtra se for diferente de undefined E diferente de null
       if (

@@ -258,6 +258,7 @@ describe('Unit test ListCustomers UseCase', () => {
         name: 'João Silva',
         email: 'joao@example.com',
         phone: '11988888881',
+        totalBookings: 0,
       });
 
       await createCustomer.execute({

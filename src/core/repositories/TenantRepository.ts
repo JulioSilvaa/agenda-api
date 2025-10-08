@@ -1,4 +1,4 @@
-import { TenantEntity } from "../entities/TenantEntity";
+import { TenantEntity } from '../entities/TenantEntity';
 
 export interface ITenantRepository {
   create(tenant: TenantEntity): Promise<TenantEntity>;

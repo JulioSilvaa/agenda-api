@@ -1,23 +1,23 @@
-import { describe, expect, test, beforeEach } from "vitest";
-import { ServiceRepositoryInMemory } from "../../infra/repositories/repositoryInMemory/ServiceRepositoryInMemory";
-import { ServiceEntity } from "../../core/entities/ServiceEntity";
+import { describe, expect, test, beforeEach } from 'vitest';
+import { ServiceRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/ServiceRepositoryInMemory';
+import { ServiceEntity } from '../../../core/entities/ServiceEntity';
 
-describe("Unit test ServiceRepositoryInMemory", () => {
+describe('Unit test ServiceRepositoryInMemory', () => {
   let repository: ServiceRepositoryInMemory;
-  const tenantId = "tenant-123";
-  const tenant2Id = "tenant-456";
+  const tenantId = 'tenant-123';
+  const tenant2Id = 'tenant-456';
 
   beforeEach(() => {
     repository = new ServiceRepositoryInMemory();
   });
 
-  describe("Create", () => {
-    test("should create service successfully", async () => {
+  describe('Create', () => {
+    test('should create service successfully', async () => {
       const service = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Corte de Cabelo",
-        description: "Corte masculino",
+        name: 'Corte de Cabelo',
+        description: 'Corte masculino',
         price: 50,
         durationMinutes: 30,
         isActive: true,
@@ -29,14 +29,14 @@ describe("Unit test ServiceRepositoryInMemory", () => {
 
       expect(created).toBeDefined();
       expect(created.id).toBe(service.id);
-      expect(created.name).toBe("Corte de Cabelo");
+      expect(created.name).toBe('Corte de Cabelo');
     });
 
-    test("should create multiple services", async () => {
+    test('should create multiple services', async () => {
       const service1 = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Serviço 1",
+        name: 'Serviço 1',
         price: 50,
         durationMinutes: 30,
         isActive: true,
@@ -47,7 +47,7 @@ describe("Unit test ServiceRepositoryInMemory", () => {
       const service2 = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Serviço 2",
+        name: 'Serviço 2',
         price: 75,
         durationMinutes: 45,
         isActive: true,
@@ -66,12 +66,12 @@ describe("Unit test ServiceRepositoryInMemory", () => {
     });
   });
 
-  describe("Update", () => {
-    test("should update service successfully", async () => {
+  describe('Update', () => {
+    test('should update service successfully', async () => {
       const service = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Original",
+        name: 'Original',
         price: 50,
         durationMinutes: 30,
         isActive: true,
@@ -82,9 +82,9 @@ describe("Unit test ServiceRepositoryInMemory", () => {
       await repository.create(service);
 
       const updated = ServiceEntity.create({
-        id: service.id ?? "",
+        id: service.id ?? '',
         tenantId: service.tenantId,
-        name: "Atualizado",
+        name: 'Atualizado',
         description: service.description ?? undefined,
         price: service.price,
         durationMinutes: service.durationMinutes,
@@ -95,14 +95,14 @@ describe("Unit test ServiceRepositoryInMemory", () => {
 
       const result = await repository.update(updated);
 
-      expect(result.name).toBe("Atualizado");
+      expect(result.name).toBe('Atualizado');
     });
 
-    test("should throw error when updating non-existent service", async () => {
+    test('should throw error when updating non-existent service', async () => {
       const service = ServiceEntity.create({
-        id: "non-existent",
+        id: 'non-existent',
         tenantId,
-        name: "Teste",
+        name: 'Teste',
         price: 50,
         durationMinutes: 30,
         isActive: true,
@@ -110,18 +110,16 @@ describe("Unit test ServiceRepositoryInMemory", () => {
         updatedAt: new Date(),
       });
 
-      await expect(() => repository.update(service)).rejects.toThrow(
-        "Serviço não encontrado"
-      );
+      await expect(() => repository.update(service)).rejects.toThrow('Serviço não encontrado');
     });
   });
 
-  describe("Delete", () => {
-    test("should delete service successfully", async () => {
+  describe('Delete', () => {
+    test('should delete service successfully', async () => {
       const service = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Para Deletar",
+        name: 'Para Deletar',
         price: 50,
         durationMinutes: 30,
         isActive: true,
@@ -136,15 +134,15 @@ describe("Unit test ServiceRepositoryInMemory", () => {
       expect(found).toBeNull();
     });
 
-    test("should not throw error when deleting non-existent service", async () => {
-      await expect(repository.delete("non-existent")).resolves.not.toThrow();
+    test('should not throw error when deleting non-existent service', async () => {
+      await expect(repository.delete('non-existent')).resolves.not.toThrow();
     });
 
-    test("should only delete specified service", async () => {
+    test('should only delete specified service', async () => {
       const service1 = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Serviço 1",
+        name: 'Serviço 1',
         price: 50,
         durationMinutes: 30,
         isActive: true,
@@ -155,7 +153,7 @@ describe("Unit test ServiceRepositoryInMemory", () => {
       const service2 = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Serviço 2",
+        name: 'Serviço 2',
         price: 75,
         durationMinutes: 45,
         isActive: true,
@@ -176,12 +174,12 @@ describe("Unit test ServiceRepositoryInMemory", () => {
     });
   });
 
-  describe("FindById", () => {
-    test("should find service by id", async () => {
+  describe('FindById', () => {
+    test('should find service by id', async () => {
       const service = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Teste",
+        name: 'Teste',
         price: 50,
         durationMinutes: 30,
         isActive: true,
@@ -194,21 +192,21 @@ describe("Unit test ServiceRepositoryInMemory", () => {
 
       expect(found).toBeDefined();
       expect(found?.id).toBe(service.id);
-      expect(found?.name).toBe("Teste");
+      expect(found?.name).toBe('Teste');
     });
 
-    test("should return null when service not found", async () => {
-      const found = await repository.findById("non-existent");
+    test('should return null when service not found', async () => {
+      const found = await repository.findById('non-existent');
       expect(found).toBeNull();
     });
   });
 
-  describe("FindByTenantId", () => {
-    test("should find all services for a tenant", async () => {
+  describe('FindByTenantId', () => {
+    test('should find all services for a tenant', async () => {
       const service1 = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Serviço 1",
+        name: 'Serviço 1',
         price: 50,
         durationMinutes: 30,
         isActive: true,
@@ -219,7 +217,7 @@ describe("Unit test ServiceRepositoryInMemory", () => {
       const service2 = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Serviço 2",
+        name: 'Serviço 2',
         price: 75,
         durationMinutes: 45,
         isActive: true,
@@ -237,17 +235,17 @@ describe("Unit test ServiceRepositoryInMemory", () => {
       expect(services[1].tenantId).toBe(tenantId);
     });
 
-    test("should return empty array when tenant has no services", async () => {
-      const services = await repository.findByTenantId("empty-tenant");
+    test('should return empty array when tenant has no services', async () => {
+      const services = await repository.findByTenantId('empty-tenant');
       expect(services).toHaveLength(0);
       expect(Array.isArray(services)).toBe(true);
     });
 
-    test("should isolate services by tenant", async () => {
+    test('should isolate services by tenant', async () => {
       const service1 = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Tenant 1 Service",
+        name: 'Tenant 1 Service',
         price: 50,
         durationMinutes: 30,
         isActive: true,
@@ -258,7 +256,7 @@ describe("Unit test ServiceRepositoryInMemory", () => {
       const service2 = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId: tenant2Id,
-        name: "Tenant 2 Service",
+        name: 'Tenant 2 Service',
         price: 75,
         durationMinutes: 45,
         isActive: true,
@@ -274,17 +272,17 @@ describe("Unit test ServiceRepositoryInMemory", () => {
 
       expect(tenant1Services).toHaveLength(1);
       expect(tenant2Services).toHaveLength(1);
-      expect(tenant1Services[0].name).toBe("Tenant 1 Service");
-      expect(tenant2Services[0].name).toBe("Tenant 2 Service");
+      expect(tenant1Services[0].name).toBe('Tenant 1 Service');
+      expect(tenant2Services[0].name).toBe('Tenant 2 Service');
     });
   });
 
-  describe("FindByName", () => {
-    test("should find service by name and tenantId", async () => {
+  describe('FindByName', () => {
+    test('should find service by name and tenantId', async () => {
       const service = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Corte Especial",
+        name: 'Corte Especial',
         price: 50,
         durationMinutes: 30,
         isActive: true,
@@ -293,23 +291,23 @@ describe("Unit test ServiceRepositoryInMemory", () => {
       });
 
       await repository.create(service);
-      const found = await repository.findByName("Corte Especial", tenantId);
+      const found = await repository.findByName('Corte Especial', tenantId);
 
       expect(found).toBeDefined();
-      expect(found?.name).toBe("Corte Especial");
+      expect(found?.name).toBe('Corte Especial');
       expect(found?.tenantId).toBe(tenantId);
     });
 
-    test("should return null when service name not found", async () => {
-      const found = await repository.findByName("Non-existent", tenantId);
+    test('should return null when service name not found', async () => {
+      const found = await repository.findByName('Non-existent', tenantId);
       expect(found).toBeNull();
     });
 
-    test("should isolate name search by tenant", async () => {
+    test('should isolate name search by tenant', async () => {
       const service1 = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Corte Premium",
+        name: 'Corte Premium',
         price: 50,
         durationMinutes: 30,
         isActive: true,
@@ -320,7 +318,7 @@ describe("Unit test ServiceRepositoryInMemory", () => {
       const service2 = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId: tenant2Id,
-        name: "Corte Premium",
+        name: 'Corte Premium',
         price: 75,
         durationMinutes: 45,
         isActive: true,
@@ -331,14 +329,8 @@ describe("Unit test ServiceRepositoryInMemory", () => {
       await repository.create(service1);
       await repository.create(service2);
 
-      const foundTenant1 = await repository.findByName(
-        "Corte Premium",
-        tenantId
-      );
-      const foundTenant2 = await repository.findByName(
-        "Corte Premium",
-        tenant2Id
-      );
+      const foundTenant1 = await repository.findByName('Corte Premium', tenantId);
+      const foundTenant2 = await repository.findByName('Corte Premium', tenant2Id);
 
       expect(foundTenant1).toBeDefined();
       expect(foundTenant2).toBeDefined();
@@ -346,11 +338,11 @@ describe("Unit test ServiceRepositoryInMemory", () => {
       expect(foundTenant2?.id).toBe(service2.id);
     });
 
-    test("should be case-sensitive", async () => {
+    test('should be case-sensitive', async () => {
       const service = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Corte de Cabelo",
+        name: 'Corte de Cabelo',
         price: 50,
         durationMinutes: 30,
         isActive: true,
@@ -360,26 +352,20 @@ describe("Unit test ServiceRepositoryInMemory", () => {
 
       await repository.create(service);
 
-      const foundExact = await repository.findByName(
-        "Corte de Cabelo",
-        tenantId
-      );
-      const foundDifferentCase = await repository.findByName(
-        "corte de cabelo",
-        tenantId
-      );
+      const foundExact = await repository.findByName('Corte de Cabelo', tenantId);
+      const foundDifferentCase = await repository.findByName('corte de cabelo', tenantId);
 
       expect(foundExact).toBeDefined();
       expect(foundDifferentCase).toBeNull();
     });
   });
 
-  describe("Edge Cases", () => {
-    test("should handle service with null description", async () => {
+  describe('Edge Cases', () => {
+    test('should handle service with null description', async () => {
       const service = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Serviço",
+        name: 'Serviço',
         description: undefined,
         price: 50,
         durationMinutes: 30,
@@ -394,11 +380,11 @@ describe("Unit test ServiceRepositoryInMemory", () => {
       expect(found?.description).toBeNull();
     });
 
-    test("should handle inactive services", async () => {
+    test('should handle inactive services', async () => {
       const service = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Serviço Inativo",
+        name: 'Serviço Inativo',
         price: 50,
         durationMinutes: 30,
         isActive: false,
@@ -412,11 +398,11 @@ describe("Unit test ServiceRepositoryInMemory", () => {
       expect(found?.isActive).toBe(false);
     });
 
-    test("should maintain service list after multiple operations", async () => {
+    test('should maintain service list after multiple operations', async () => {
       const service1 = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Serviço 1",
+        name: 'Serviço 1',
         price: 50,
         durationMinutes: 30,
         isActive: true,
@@ -427,7 +413,7 @@ describe("Unit test ServiceRepositoryInMemory", () => {
       const service2 = ServiceEntity.create({
         id: crypto.randomUUID(),
         tenantId,
-        name: "Serviço 2",
+        name: 'Serviço 2',
         price: 75,
         durationMinutes: 45,
         isActive: true,

@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach } from 'vitest';
-import { TenantRepositoryInMemory } from '../../infra/repositories/repositoryInMemory/TenantRepositoryInMemory';
-import { TenantEntity } from '../../core/entities/TenantEntity';
+import { TenantRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/TenantRepositoryInMemory';
+import { TenantEntity } from '../../../core/entities/TenantEntity';
 
 describe('Unit test TenantRepositoryInMemory', () => {
   let repository: TenantRepositoryInMemory;
