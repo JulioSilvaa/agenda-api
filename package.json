@@ -17,13 +17,14 @@
     "format:check": "prettier --check \"src/**/*.{ts,json}\"",
     "prepare": "husky",
     "db:seed:customers": "tsx scripts/seedCustomers.ts",
-    "db:customers": "tsx scripts/listCustomers.ts"
+    "db:customers": "tsx scripts/listCustomers.ts",
+    "test:staged": "node scripts/test-staged.mjs"
   },
   "lint-staged": {
     "*.ts": [
       "prettier --write",
       "eslint --fix",
-      "vitest related --run"
+      "test:staged"
     ],
     "*.json": [
       "prettier --write"
