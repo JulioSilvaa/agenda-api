@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-env node */
 import { execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 
@@ -40,6 +41,6 @@ try {
   } else {
     execSync('npx vitest related --run', { stdio: 'inherit' });
   }
-} catch (e) {
+} catch {
   process.exit(1);
 }

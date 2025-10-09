@@ -1,4 +1,4 @@
-import TenantAdapter, { TenantRow } from '../../../adapters/TenantAdapter';
+import TenantAdapter from '../../../adapters/TenantAdapter';
 import { TenantEntity } from '../../../core/entities/TenantEntity';
 import { ITenantRepository } from '../../../core/repositories/TenantRepository';
 import { getSqliteClient } from '../../db/sqliteClient';
@@ -31,13 +31,32 @@ export class TenantRepositorySqlite implements ITenantRepository {
     `);
   }
 
-  private rowToEntity(row: TenantRow): TenantEntity {
-    return TenantAdapter.fromRow(row);
+  private rowToEntity(row: {
+    id: string;
+    name: string;
+    slug: string;
+    email: string;
+    phone: string | null;
+    isActive: number;
+    address: string | null;
+    password: string;
+  }): TenantEntity {
+    if (!row) throw new Error('Row inválido para criação de TenantEntity');
+    return TenantEntity.create({
+      id: row.id,
+      name: row.name,
+      slug: row.slug,
+      email: row.email,
+      phone: row.phone ?? undefined,
+      isActive: row.isActive === undefined ? true : !!row.isActive,
+      address: row.address ?? undefined,
+      password: row.password,
+    });
   }
 
   async create(tenant: TenantEntity): Promise<TenantEntity> {
     const db = await this.ready();
-    const p = TenantAdapter.toPersistence(tenant);
+    const p = TenantAdapter.create(tenant);
     await db.run(
       `INSERT INTO tenants (id, name, slug, email, phone, isActive, address, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [p.id, p.name, p.slug, p.email, p.phone, p.isActive, p.address, p.password]
@@ -58,7 +77,7 @@ export class TenantRepositorySqlite implements ITenantRepository {
 
   async update(tenant: TenantEntity): Promise<TenantEntity> {
     const db = await this.ready();
-    const p = TenantAdapter.toPersistence(tenant);
+    const p = TenantAdapter.create(tenant);
     const result = await db.run(
       `UPDATE tenants SET name = ?, slug = ?, email = ?, phone = ?, isActive = ?, address = ?, password = ? WHERE id = ?`,
       [p.name, p.slug, p.email, p.phone, p.isActive, p.address, p.password, p.id]
