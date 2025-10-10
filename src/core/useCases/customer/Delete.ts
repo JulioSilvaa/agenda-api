@@ -1,7 +1,7 @@
-import { CustomerRepositoryInMemory } from '../../../infra/repositories/repositoryInMemory/CustomerRepositoryInMemory';
+import { ICustomerRepository } from '../../repositories/CustomerRepository';
 
 export class DeleteCustomer {
-  constructor(private customerRepository: CustomerRepositoryInMemory) {}
+  constructor(private customerRepository: ICustomerRepository) {}
 
   async execute(customerId: string, tenantId: string): Promise<void> {
     const customer = await this.customerRepository.findById(customerId);

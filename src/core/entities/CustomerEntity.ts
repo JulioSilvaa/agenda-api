@@ -1,4 +1,4 @@
-import { ICustomer } from "../interfaces/Customer";
+import { ICustomer } from '../interfaces/Customer';
 
 export class CustomerEntity {
   private readonly _id?: string;
@@ -40,34 +40,34 @@ export class CustomerEntity {
 
   private validateName(): void {
     if (!this._name || this._name.trim().length === 0) {
-      throw new Error("Nome é obrigatório");
+      throw new Error('Nome é obrigatório');
     }
 
     if (this._name.trim().length < 3) {
-      throw new Error("Nome deve ter pelo menos 3 caracteres");
+      throw new Error('Nome deve ter pelo menos 3 caracteres');
     }
 
     if (this._name.length > 100) {
-      throw new Error("Nome não pode ter mais de 100 caracteres");
+      throw new Error('Nome não pode ter mais de 100 caracteres');
     }
   }
 
   private validatePhone(): void {
     if (!this._phone || this._phone.trim().length === 0) {
-      throw new Error("Telefone é obrigatório");
+      throw new Error('Telefone é obrigatório');
     }
 
-    const numeroLimpo = this._phone.replace(/\D/g, "");
+    const numeroLimpo = this._phone.replace(/\D/g, '');
 
     if (numeroLimpo.length < 8 || numeroLimpo.length > 11) {
-      throw new Error("Telefone inválido. Use formato brasileiro com DDD");
+      throw new Error('Telefone inválido. Use formato brasileiro com DDD');
     }
 
     const phoneRegex =
       /^(?:(?:\+|00)?(55)\s?)?(?:\(?([1-9][0-9])\)?\s?)?(?:((?:9\d|[2-9])\d{3})[-]?(\d{4}))$/;
 
     if (!phoneRegex.test(this._phone) && !phoneRegex.test(numeroLimpo)) {
-      throw new Error("Telefone inválido. Use formato brasileiro com DDD");
+      throw new Error('Telefone inválido. Use formato brasileiro com DDD');
     }
   }
 
@@ -80,27 +80,25 @@ export class CustomerEntity {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this._email)) {
-      throw new Error("Email inválido");
+      throw new Error('Email inválido');
     }
   }
 
   private validateTenantId(): void {
     if (!this._tenantId || this._tenantId.trim().length === 0) {
-      throw new Error("TenantId é obrigatório");
+      throw new Error('TenantId é obrigatório');
     }
   }
 
   private validateTotalBookings(): void {
     if (this._totalBookings < 0) {
-      throw new Error("Total de agendamentos não pode ser negativo");
+      throw new Error('Total de agendamentos não pode ser negativo');
     }
   }
 
   private validateDates(): void {
     if (this._updatedAt < this._createdAt) {
-      throw new Error(
-        "Data de atualização não pode ser anterior à data de criação"
-      );
+      throw new Error('Data de atualização não pode ser anterior à data de criação');
     }
   }
 

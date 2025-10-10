@@ -1,11 +1,13 @@
 import { AvailabilityEntity } from '../../entities/AvailabilityEntity';
 import { AppError } from '../../errors/AppError';
 import { IAvailability } from '../../interfaces/Availability';
+import { IAvailabilityRepository } from '../../repositories/AvailabilityRepository';
+import { ITenantRepository } from '../../repositories/TenantRepository';
 
 export default class UpdateAvailability {
   constructor(
-    private availabilityRepository: any,
-    private tenantRepository: any
+    private availabilityRepository: IAvailabilityRepository,
+    private tenantRepository: ITenantRepository
   ) {}
 
   async execute(
@@ -24,8 +26,13 @@ export default class UpdateAvailability {
 
     // Montar objeto atualizado
     const updated: IAvailability = {
-      ...current,
-      ...data,
+      id: current.id!,
+      tenantId: current.tenantId,
+      weekday: data.weekday !== undefined ? data.weekday : current.weekday,
+      startTime: data.startTime !== undefined ? data.startTime : current.startTime,
+      endTime: data.endTime !== undefined ? data.endTime : current.endTime,
+      isActive: data.isActive !== undefined ? data.isActive : current.isActive,
+      createdAt: current.createdAt,
       updatedAt: new Date(),
     };
 
@@ -33,8 +40,11 @@ export default class UpdateAvailability {
     let entity: AvailabilityEntity;
     try {
       entity = AvailabilityEntity.create(updated);
-    } catch (err: any) {
-      throw new AppError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        throw new AppError(err.message);
+      }
+      throw new AppError('Erro de validação desconhecido');
     }
 
     // Validar conflito de horários

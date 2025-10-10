@@ -2,13 +2,17 @@ name: CI
 
 on:
   push:
-    branches: [main, testes]
+    branches: [main, testes, testsIntegration]
   pull_request:
-    branches: [main, testes]
+    branches: [main, testes, testsIntegration]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    environment: SUPABASE
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
     steps:
       - name: Checkout código
@@ -21,6 +25,20 @@ jobs:
 
       - name: Instalar dependências
         run: yarn install --frozen-lockfile
+
+      - name: Validar DATABASE_URL presente
+        run: |
+          if [ -z "${DATABASE_URL}" ]; then
+            echo "DATABASE_URL está vazio. Verifique se o secret DATABASE_URL está definido no Environment 'SUPABASE' e se o job está associado a esse environment."
+            exit 1
+          fi
+          echo "DATABASE_URL detectado (valor oculto). Prosseguindo..."
+
+      - name: Gerar Prisma Client
+        run: npx prisma generate
+
+      - name: Aplicar migrações
+        run: npx prisma migrate deploy
 
       - name: Rodar testes
         run: yarn test

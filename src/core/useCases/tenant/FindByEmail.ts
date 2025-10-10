@@ -1,4 +1,4 @@
-import { ITenantRepository } from "../../repositories/TenantRepository";
+import { ITenantRepository } from '../../repositories/TenantRepository';
 
 export class FindTenantByEmail {
   private readonly tenantRepository: ITenantRepository;
@@ -8,7 +8,7 @@ export class FindTenantByEmail {
   async execute(email: string) {
     const tenant = await this.tenantRepository.findByEmail(email);
     if (!tenant) {
-      throw new Error("Tenant não encontrado");
+      throw new Error('Tenant não encontrado');
     }
     return tenant;
   }

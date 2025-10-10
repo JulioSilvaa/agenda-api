@@ -5,5 +5,9 @@ node_modules/
 .prettierignore
 node_modules/
 coverage/
-
+dist/
+.env
 *.md
+*.sqlite
+*.db
+sqlite-data/

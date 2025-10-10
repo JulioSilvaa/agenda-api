@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  email     String   @unique
+  phone     String?
+  isActive  Boolean  @default(true)
+  address   String?
+  password  String
+
+  users          User[]
+  services       Service[]
+  customers      Customer[]
+  bookings       Booking[]
+  availabilities Availability[]
+  blockedSlots   BlockedSlot[]
+
+  @@map("tenants")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  tenantId  String
+  name      String
+  email     String
+  password  String
+  role      UserRole
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // inversas
+  bookingsAsStaff Booking[]   @relation("UserBookingsAsStaff")
+  blockedSlots    BlockedSlot[] @relation("UserBlockedSlots")
+
+  @@unique([tenantId, email])
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  STAFF
+}
+
+model Customer {
+  id            String   @id @default(uuid())
+  tenantId      String
+  name          String
+  email         String?
+  phone         String
+  isActive      Boolean  @default(true)
+  totalBookings Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@index([tenantId, name])
+  @@map("customers")
+}
+
+model Service {
+  id              String   @id @default(uuid())
+  tenantId        String
+  name            String
+  description     String?
+  price           Decimal  @db.Decimal(10,2)
+  durationMinutes Int
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@index([tenantId, name])
+  @@map("services")
+}
+
+model Booking {
+  id             String        @id @default(uuid())
+  tenantId       String
+  customerId     String?
+  serviceId      String?
+  staffUserId    String?
+  status         BookingStatus
+  requestedStart DateTime
+  requestedEnd   DateTime
+  notes          String?
+  rating         Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customer Customer? @relation(fields: [customerId], references: [id])
+  service  Service?  @relation(fields: [serviceId], references: [id])
+  staff    User?     @relation("UserBookingsAsStaff", fields: [staffUserId], references: [id])
+
+  @@index([tenantId, requestedStart])
+  @@map("bookings")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model Availability {
+  id        String   @id @default(uuid())
+  tenantId  String
+  weekday   Int
+  startTime String
+  endTime   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, weekday])
+  @@map("availabilities")
+}
+
+model BlockedSlot {
+  id          String   @id @default(uuid())
+  tenantId    String
+  staffUserId String?
+  startTime   DateTime
+  endTime     DateTime
+  reason      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  staff  User?  @relation("UserBlockedSlots", fields: [staffUserId], references: [id])
+
+  @@index([tenantId, startTime])
+  @@map("blocked_slots")
+}
