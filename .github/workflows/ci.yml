@@ -10,6 +10,24 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
     steps:
       - name: Checkout código
         uses: actions/checkout@v3
@@ -22,6 +40,12 @@ jobs:
       - name: Instalar dependências
         run: yarn install --frozen-lockfile
 
+      - name: Gerar Prisma Client
+        run: npx prisma generate
+
+      - name: Aplicar migrações
+        run: npx prisma migrate deploy
+       
       - name: Rodar testes
         run: yarn test
 
