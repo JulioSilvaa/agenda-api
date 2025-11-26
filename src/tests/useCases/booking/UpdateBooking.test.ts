@@ -52,8 +52,8 @@ describe('Unit test UpdateBooking UseCase', () => {
 
   const validBooking = {
     status: BookingStatus.PENDING,
-    requestedStart: new Date('2025-10-20T10:00:00'),
-    requestedEnd: new Date('2025-10-21T10:30:00'),
+    requestedStart: new Date('2025-12-25T10:00:00'),
+    requestedEnd: new Date('2025-12-26T10:30:00'),
   };
 
   beforeEach(async () => {
